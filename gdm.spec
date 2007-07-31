@@ -16,7 +16,7 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 2.18.3
+Version: 2.18.4
 Release: 1%{?dist}
 Epoch: 1
 License: LGPL/GPL
@@ -390,6 +390,10 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Tue Jul 31 2007 Ray Strode <rstrode@redhat.com> - 1:2.18.4-1
+- Update to 2.18.4
+- Fixes CVE-2007-3381
+
 * Fri Jul  6 2007 Matthias Clasen <mclasen@redhat.com> - 1:2.18.3-1
 - Update to 2.18.3
 
