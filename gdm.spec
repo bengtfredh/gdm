@@ -17,7 +17,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.18.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: LGPL/GPL
 Group: User Interface/X
@@ -74,6 +74,9 @@ Patch34: gdm-2.18.0-add-lowres-fix.patch
 Patch36: gdm-2.18.0-dont-expect-utf8.patch
 
 Patch37: gdm-2.18.0-hide-disabled-users.patch
+
+# http://bugzilla.gnome.org/show_bug.cgi?id=457998
+Patch38: gdm-2.18.0-dont-warp-pointer-to-stylus.patch
 
 # https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=234567
 Patch99: gdm-2.18.0-be-more-verbose.patch
@@ -167,6 +170,7 @@ Extra icons / faces for the GNOME Display Manager.
 %patch34 -p1 -b .add-lowres-fix
 %patch36 -p1 -b .dont-expect-utf8
 %patch37 -p1 -b hide-disabled-users
+%patch38 -p1 -b .dont-warp-pointer-to-stylus
 %patch99 -p1 -b .be-more-verbose
 
 %build
@@ -390,6 +394,11 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Fri Aug 17 2007 Ray Strode <rstrode@redhat.com> - 1:2.18.4-2
+- Provide fix to upstream bug 457998 for Hans de Goede to
+  test
+- disable dwellmouselistener by default to address bug 457998
+
 * Tue Jul 31 2007 Ray Strode <rstrode@redhat.com> - 1:2.18.4-1
 - Update to 2.18.4
 - Fixes CVE-2007-3381
