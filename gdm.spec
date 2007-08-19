@@ -397,7 +397,7 @@ fi
 * Fri Aug 17 2007 Ray Strode <rstrode@redhat.com> - 1:2.18.4-2
 - Provide fix to upstream bug 457998 for Hans de Goede to
   test
-- disable dwellmouselistener by default to address bug 457998
+- disable dwellmouselistener by default to address (bug 246399)
 
 * Tue Jul 31 2007 Ray Strode <rstrode@redhat.com> - 1:2.18.4-1
 - Update to 2.18.4
