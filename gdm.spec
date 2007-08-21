@@ -17,7 +17,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.18.4
-Release: 2%{?dist}
+Release: 3%{?dist}
 Epoch: 1
 License: LGPL/GPL
 Group: User Interface/X
@@ -394,6 +394,9 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Tue Aug 21 2007 Ray Strode <rstrode@redhat.com> - 1:2.18.4-3
+- write utmp entry at login (bug 247987)
+
 * Fri Aug 17 2007 Ray Strode <rstrode@redhat.com> - 1:2.18.4-2
 - Provide fix to upstream bug 457998 for Hans de Goede to
   test
