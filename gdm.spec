@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.20.0
-Release: 15%{?dist}
+Release: 16%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -87,7 +87,7 @@ Requires: pam >= 0:%{pam_version}
 Requires: usermode
 Requires: /sbin/nologin
 Requires: system-logos
-Requires: fedorainfinity-gdm-theme 
+Requires: fedorainfinity-gdm-theme >= 8.0.0
 Requires: xorg-x11-server-utils
 Requires: xorg-x11-xkb-utils
 Requires: xorg-x11-xinit
@@ -373,6 +373,9 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Thu Oct 11 2007 Ray Strode <rstrode@redhat.com> - 1:2.20.0-16
+- make fedorainfinity-gdm-theme requires be versioned
+
 * Fri Oct 5 2007 Dan Walsh <dwalsh@redhat.com> - 1:2.20.0-14
 - Added pam_selinux_permit and pam_namespace to gdm-pam
   * This pam module allows user without a password to login when selinux is in enforcing mode
