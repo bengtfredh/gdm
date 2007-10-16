@@ -15,8 +15,8 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 2.20.0
-Release: 16%{?dist}
+Version: 2.20.1
+Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -54,15 +54,6 @@ Patch35: gdmsetup-path.patch
 
 # https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=254164
 Patch37: gdm-2.19.8-selinux.patch
-
-# fixed in upstream svn
-Patch38: hang.patch
-
-# http://bugzilla.gnome.org/show_bug.cgi?id=473480
-Patch39: gdm-2.20.0-fix-savedie.patch
-
-# http://bugzilla.gnome.org/show_bug.cgi?id=453916
-Patch40: gdm-2.20.0-fix-default-language.patch
 
 # http://bugzilla.gnome.org/show_bug.cgi?id=482348
 Patch41: pixbuf-ref.patch
@@ -155,9 +146,6 @@ Extra icons / faces for the GNOME Display Manager.
 %patch33 -p1 -b .pass-ats-to-session
 %patch35 -p1 -b .gdmsetup-path
 %patch37 -p1 -b .selinux
-%patch38 -p1 -b .hang
-%patch39 -p1 -b .fix-savedie
-%patch40 -p1 -b .fix-default-language
 %patch41 -p1 -b .pixbuf-ref
 %patch42 -p1 -b .allow-escape
 
@@ -373,6 +361,9 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Tue Oct 16 2007 Matthias Clasen <mclasen@redhat.com> - 1:2.20.1-1
+- Update to 2.20.1
+
 * Thu Oct 11 2007 Ray Strode <rstrode@redhat.com> - 1:2.20.0-16
 - make fedorainfinity-gdm-theme requires be versioned
 
