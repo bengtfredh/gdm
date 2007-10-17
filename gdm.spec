@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.20.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -361,6 +361,9 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Wed Oct  17 2007 Dan Walsh <dwalsh@redhat.com> - 1:2.20.1-1
+- Change pam config so keyinit happens after pam_selinux open
+
 * Tue Oct 16 2007 Matthias Clasen <mclasen@redhat.com> - 1:2.20.1-1
 - Update to 2.20.1
 
