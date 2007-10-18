@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.20.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -61,9 +61,11 @@ Patch41: pixbuf-ref.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=135965
 Patch42: gdm-2.20.0-allow-escape.patch
 
+# http://bugzilla.redhat.com/show_bug.cgi?id=246399
+Patch43: gdm-2.20.1-keymouselistener-segfault.patch
+
 Patch100: gdm-2.20.0-change-defaults.patch
 Patch101: stupid-bullets.patch
-Patch102: gdm-2.20.1-keymouselistener-segfault.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n) 
 
@@ -149,10 +151,10 @@ Extra icons / faces for the GNOME Display Manager.
 %patch37 -p1 -b .selinux
 %patch41 -p1 -b .pixbuf-ref
 %patch42 -p1 -b .allow-escape
+%patch43 -p1 -b .keymouselistener-segfault
 
 %patch100 -p1 -b .change-defaults
 %patch101 -p1 -b .stupid-bullets
-%patch102 -p1 -b .keymouselistener-segfault
 
 %build
 cp -f %{SOURCE1} config/gdm
@@ -363,6 +365,9 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Wed Oct  17 2007 Ray Strode <rstrode@redhat.com> - 1:2.20.1-4
+- Improve Warren's fix (#246399)
+
 * Wed Oct  17 2007 Warren Togami <wtogami@redhat.com> - 1:2.20.1-3
 - Fix GDM segfault when XInput extension not available
   Also fixes XDMCP (#246399)
