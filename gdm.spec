@@ -17,7 +17,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.18.4
-Release: 3%{?dist}
+Release: 4%{?dist}
 Epoch: 1
 License: LGPL/GPL
 Group: User Interface/X
@@ -77,6 +77,9 @@ Patch37: gdm-2.18.0-hide-disabled-users.patch
 
 # http://bugzilla.gnome.org/show_bug.cgi?id=457998
 Patch38: gdm-2.18.0-dont-warp-pointer-to-stylus.patch
+
+# http://bugzilla.redhat.com/show_bug.cgi?id=246399
+Patch39: gdm-2.20.1-keymouselistener-segfault.patch
 
 # https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=234567
 Patch99: gdm-2.18.0-be-more-verbose.patch
@@ -394,6 +397,10 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Wed Oct 17 2007 Ray Strode <rstrode@redhat.com> - 1:2.18.4-4
+- Fix crash in keymouselistener plugin to address part two of
+  bug 246399
+
 * Tue Aug 21 2007 Ray Strode <rstrode@redhat.com> - 1:2.18.4-3
 - write utmp entry at login (bug 247987)
 
