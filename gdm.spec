@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.20.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -64,7 +64,7 @@ Patch42: gdm-2.20.0-allow-escape.patch
 # http://bugzilla.redhat.com/show_bug.cgi?id=246399
 Patch43: gdm-2.20.1-keymouselistener-segfault.patch
 
-Patch100: gdm-2.20.0-change-defaults.patch
+Patch100: gdm-2.20.1-change-defaults.patch
 Patch101: stupid-bullets.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n) 
@@ -365,6 +365,9 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Fri Oct  26 2007 Ray Strode <rstrode@redhat.com> - 1:2.20.1-5
+- fix gdmflexiserver -n (bug 352491)
+
 * Wed Oct  17 2007 Ray Strode <rstrode@redhat.com> - 1:2.20.1-4
 - Improve Warren's fix (#246399)
 
