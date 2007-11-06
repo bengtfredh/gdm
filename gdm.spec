@@ -17,7 +17,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.18.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 Epoch: 1
 License: LGPL/GPL
 Group: User Interface/X
@@ -81,6 +81,9 @@ Patch38: gdm-2.18.0-dont-warp-pointer-to-stylus.patch
 # http://bugzilla.redhat.com/show_bug.cgi?id=246399
 Patch39: gdm-2.20.1-keymouselistener-segfault.patch
 
+# https://bugzilla.redhat.com/show_bug.cgi?id=363011
+Patch40: gdm-2.18.4-tcp-wrappers.patch
+
 # https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=234567
 Patch99: gdm-2.18.0-be-more-verbose.patch
 
@@ -135,6 +138,7 @@ BuildRequires: xorg-x11-server-Xorg
 %endif
 BuildRequires: nss-devel >= %{nss_version}
 BuildRequires: ConsoleKit
+BuildRequires: tcp_wrappers-devel
 Requires: libselinux >= %{libselinuxver}
 Requires: audit-libs >= %{libauditver}
 
@@ -174,6 +178,8 @@ Extra icons / faces for the GNOME Display Manager.
 %patch36 -p1 -b .dont-expect-utf8
 %patch37 -p1 -b hide-disabled-users
 %patch38 -p1 -b .dont-warp-pointer-to-stylus
+%patch39 -p1 -b .key-mouse-listener
+%patch40 -p1 -b .tcp-wrappers
 %patch99 -p1 -b .be-more-verbose
 
 %build
@@ -191,6 +197,7 @@ autoheader
 	   --enable-console-helper \
 	   --disable-scrollkeeper  \
 	   --with-selinux \
+	   --with-tcp-wrappers=yes \
 	   --with-console-kit
 make
 
@@ -397,6 +404,9 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Tue Nov  6 2007 Ray Strode <rstrode@redhat.com> - 1:2.18.4-5
+- link against tcp_wrappers (bug 363011, CVE-2007-5079)
+
 * Wed Oct 17 2007 Ray Strode <rstrode@redhat.com> - 1:2.18.4-4
 - Fix crash in keymouselistener plugin to address part two of
   bug 246399

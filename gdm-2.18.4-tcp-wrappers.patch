@@ -1,0 +1,26 @@
+We just fill LIBWRAP_PATH with junk so it passes the rest of the tests
+
+diff -up gdm-2.18.4/configure.ac.tcp-wrappers gdm-2.18.4/configure.ac
+--- gdm-2.18.4/configure.ac.tcp-wrappers	2007-11-06 17:45:44.000000000 -0500
++++ gdm-2.18.4/configure.ac	2007-11-06 17:45:51.000000000 -0500
+@@ -546,7 +546,7 @@ if test x$with_tcp_wrappers = xno ; then
+ 	echo "TCP wrappers disabled"
+ else
+   AC_MSG_CHECKING([whether to use TCP wrappers])
+-  LIBWRAP_PATH=""
++  LIBWRAP_PATH="-lwrap"
+   case "$host" in
+     *-*-solaris*)
+ 	if test -f /usr/sfw/lib/libwrap.so; then
+diff -up gdm-2.18.4/configure.tcp-wrappers gdm-2.18.4/configure
+--- gdm-2.18.4/configure.tcp-wrappers	2007-07-30 16:10:54.000000000 -0400
++++ gdm-2.18.4/configure	2007-11-06 17:45:13.000000000 -0500
+@@ -29409,7 +29409,7 @@ if test x$with_tcp_wrappers = xno ; then
+ else
+   { echo "$as_me:$LINENO: checking whether to use TCP wrappers" >&5
+ echo $ECHO_N "checking whether to use TCP wrappers... $ECHO_C" >&6; }
+-  LIBWRAP_PATH=""
++  LIBWRAP_PATH="-lwrap"
+   case "$host" in
+     *-*-solaris*)
+ 	if test -f /usr/sfw/lib/libwrap.so; then
