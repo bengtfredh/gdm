@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.20.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -63,6 +63,8 @@ Patch42: gdm-2.20.0-allow-escape.patch
 
 # http://bugzilla.redhat.com/show_bug.cgi?id=246399
 Patch43: gdm-2.20.1-keymouselistener-segfault.patch
+
+patch44: gdm-2.18.4-tcp-wrappers.patch
 
 Patch100: gdm-2.20.1-change-defaults.patch
 Patch101: stupid-bullets.patch
@@ -118,6 +120,7 @@ BuildRequires: xorg-x11-server-Xorg
 BuildRequires: nss-devel >= %{nss_version}
 BuildRequires: ConsoleKit
 BuildRequires: libselinux-devel
+BuildRequires: tcp_wrappers-devel
 
 Requires: audit-libs >= %{libauditver}
 
@@ -152,6 +155,7 @@ Extra icons / faces for the GNOME Display Manager.
 %patch41 -p1 -b .pixbuf-ref
 %patch42 -p1 -b .allow-escape
 %patch43 -p1 -b .keymouselistener-segfault
+%patch44 -p1 -b .tcp-wrappers
 
 %patch100 -p1 -b .change-defaults
 %patch101 -p1 -b .stupid-bullets
@@ -365,6 +369,9 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Tue Nov  6 2007 Ray Strode <rstrode@redhat.com> - 1:2.20.1-6
+- link tcp wrappers in (bug 363021), CVE-2007-5079
+
 * Fri Oct  26 2007 Ray Strode <rstrode@redhat.com> - 1:2.20.1-5
 - fix gdmflexiserver -n (bug 352491)
 
