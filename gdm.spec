@@ -355,6 +355,7 @@ fi
 %{_datadir}/pixmaps/faces/*.png
 %{_datadir}/pixmaps/faces/*.jpg
 %{_datadir}/icons/hicolor/*/apps/*.png
+%{_datadir}/icons/hicolor/*/apps/*.svg
 %{_datadir}/gdm
 %{_datadir}/hal/fdi/policy/20thirdparty/90-grant-audio-devices-to-gdm.fdi
 %{_libdir}/gtk-2.0/modules/*.so
