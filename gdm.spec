@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.20.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -66,7 +66,10 @@ Patch43: gdm-2.20.1-keymouselistener-segfault.patch
 
 # hack around broken tcp wrappers support
 # FIXME need to file upstream and get fixed in 2.20
-patch44: gdm-2.18.4-tcp-wrappers.patch
+Patch44: gdm-2.18.4-tcp-wrappers.patch
+
+# http://bugzilla.gnome.org/show_bug.cgi?id=500362
+Patch45: gdm-2.20.1-suspend.patch
 
 Patch100: gdm-2.20.1-change-defaults.patch
 Patch101: stupid-bullets.patch
@@ -158,6 +161,7 @@ Extra icons / faces for the GNOME Display Manager.
 %patch42 -p1 -b .allow-escape
 %patch43 -p1 -b .keymouselistener-segfault
 %patch44 -p1 -b .tcp-wrappers
+%patch45 -p1 -b .suspend
 
 %patch100 -p1 -b .change-defaults
 %patch101 -p1 -b .stupid-bullets
@@ -372,6 +376,10 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Fri Nov 30 2007 Ray Strode <rstrode@redhat.com> - 1:2.20.2-2
+- Add suspend patch from Philippe Troin <phil@fifi.org>
+  (bug 387001)
+
 * Tue Nov 27 2007 Matthias Clasen <mclasen@redhat.com> - 1:2.20.2-1
 - Update to 2.20.2
 
