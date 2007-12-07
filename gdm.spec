@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.20.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -71,7 +71,7 @@ Patch44: gdm-2.18.4-tcp-wrappers.patch
 # http://bugzilla.gnome.org/show_bug.cgi?id=500362
 Patch45: gdm-2.20.1-suspend.patch
 
-Patch100: gdm-2.20.1-change-defaults.patch
+Patch100: gdm-2.20.2-change-defaults.patch
 Patch101: stupid-bullets.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n) 
@@ -376,6 +376,10 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Fri Dec  7 2007 Ray Strode <rstrode@redhat.com> - 1:2.20.2-3
+- increase X server startup timeout, since 10 seconds is too short
+  for some configurations (bug 413961)
+
 * Fri Nov 30 2007 Ray Strode <rstrode@redhat.com> - 1:2.20.2-2
 - Add suspend patch from Philippe Troin <phil@fifi.org>
   (bug 387001)

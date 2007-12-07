@@ -1,6 +1,6 @@
-diff -up gdm-2.20.1/config/gdm.conf.in.change-defaults gdm-2.20.1/config/gdm.conf.in
---- gdm-2.20.1/config/gdm.conf.in.change-defaults	2007-10-26 02:06:10.000000000 -0400
-+++ gdm-2.20.1/config/gdm.conf.in	2007-10-26 02:09:07.000000000 -0400
+diff -up gdm-2.20.2/config/gdm.conf.in.change-defaults gdm-2.20.2/config/gdm.conf.in
+--- gdm-2.20.2/config/gdm.conf.in.change-defaults	2007-12-07 10:24:44.000000000 -0500
++++ gdm-2.20.2/config/gdm.conf.in	2007-12-07 10:25:51.000000000 -0500
 @@ -66,9 +66,9 @@ TimedLoginDelay=30
  # should leave this alone.
  #Chooser=@libexecdir@/gdmchooser
@@ -113,6 +113,15 @@ diff -up gdm-2.20.1/config/gdm.conf.in.change-defaults gdm-2.20.1/config/gdm.con
  
  # If true then the last login information is printed to the user before being
  # prompted for password.  While this gives away some info on what users are on
+@@ -237,7 +236,7 @@ XnestUnscaledFontPath=@X_XNEST_UNSCALED_
+ 
+ # How long gdm should wait before it assumes a started Xserver is defunct and
+ # kills it.  10 seconds should be long enough for X, but Xgl may need 20 or 25. 
+-GdmXserverTimeout=10
++GdmXserverTimeout=60
+ 
+ # Whether or not to listen for smart card insertion/removal events
+ SecurityTokensEnable=true
 @@ -356,7 +355,7 @@ Enable=false
  #GtkRC=@datadir@/themes/Default/gtk-2.0/gtkrc
  
