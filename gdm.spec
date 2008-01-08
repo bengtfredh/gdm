@@ -65,9 +65,6 @@ Patch43: gdm-2.20.1-keymouselistener-segfault.patch
 # FIXME need to file upstream and get fixed in 2.20
 Patch44: gdm-2.18.4-tcp-wrappers.patch
 
-# http://bugzilla.gnome.org/show_bug.cgi?id=500362
-Patch45: gdm-2.20.1-suspend.patch
-
 Patch100: gdm-2.20.2-change-defaults.patch
 Patch101: stupid-bullets.patch
 
@@ -157,7 +154,6 @@ Extra icons / faces for the GNOME Display Manager.
 %patch41 -p1 -b .pixbuf-ref
 %patch43 -p1 -b .keymouselistener-segfault
 %patch44 -p1 -b .tcp-wrappers
-%patch45 -p1 -b .suspend
 
 %patch100 -p1 -b .change-defaults
 %patch101 -p1 -b .stupid-bullets
@@ -374,7 +370,7 @@ fi
 %changelog
 * Tue Jan 08 2008 - Bastien Nocera <bnocera@redhat.com> - 1:2.20.3-1
 - Update to 2.20.3
-- Remove obsolete patch
+- Remove obsolete patches
 
 * Fri Dec  7 2007 Ray Strode <rstrode@redhat.com> - 1:2.20.2-3
 - increase X server startup timeout, since 10 seconds is too short
