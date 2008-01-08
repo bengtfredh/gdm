@@ -58,9 +58,6 @@ Patch37: gdm-2.19.8-selinux.patch
 # http://bugzilla.gnome.org/show_bug.cgi?id=482348
 Patch41: pixbuf-ref.patch
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=135965
-Patch42: gdm-2.20.0-allow-escape.patch
-
 # http://bugzilla.redhat.com/show_bug.cgi?id=246399
 Patch43: gdm-2.20.1-keymouselistener-segfault.patch
 
@@ -158,7 +155,6 @@ Extra icons / faces for the GNOME Display Manager.
 %patch35 -p1 -b .gdmsetup-path
 %patch37 -p1 -b .selinux
 %patch41 -p1 -b .pixbuf-ref
-%patch42 -p1 -b .allow-escape
 %patch43 -p1 -b .keymouselistener-segfault
 %patch44 -p1 -b .tcp-wrappers
 %patch45 -p1 -b .suspend
@@ -378,6 +374,7 @@ fi
 %changelog
 * Tue Jan 08 2008 - Bastien Nocera <bnocera@redhat.com> - 1:2.20.3-1
 - Update to 2.20.3
+- Remove obsolete patch
 
 * Fri Dec  7 2007 Ray Strode <rstrode@redhat.com> - 1:2.20.2-3
 - increase X server startup timeout, since 10 seconds is too short
