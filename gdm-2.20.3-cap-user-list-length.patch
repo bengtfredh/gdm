@@ -1,0 +1,12 @@
+diff -up gdm-2.20.3/gui/gdmuser.c.cap-user-list-length gdm-2.20.3/gui/gdmuser.c
+--- gdm-2.20.3/gui/gdmuser.c.cap-user-list-length	2008-03-10 11:43:49.000000000 -0400
++++ gdm-2.20.3/gui/gdmuser.c	2008-03-10 11:43:53.000000000 -0400
+@@ -266,7 +266,7 @@ setup_user (struct passwd *pwent,
+ 	    gboolean read_faces)
+ {
+     GdmUser *user;
+-    int cnt = 0;
++    static int cnt = 0;
+ 
+     if (pwent->pw_shell && 
+ 	gdm_check_shell (pwent->pw_shell) &&

@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.20.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -64,6 +64,9 @@ Patch43: gdm-2.20.1-keymouselistener-segfault.patch
 # hack around broken tcp wrappers support
 # FIXME need to file upstream and get fixed in 2.20
 Patch44: gdm-2.18.4-tcp-wrappers.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=383051
+Patch45: gdm-2.20.3-cap-user-list-length.patch
 
 Patch100: gdm-2.20.2-change-defaults.patch
 Patch101: stupid-bullets.patch
@@ -154,6 +157,7 @@ Extra icons / faces for the GNOME Display Manager.
 %patch41 -p1 -b .pixbuf-ref
 %patch43 -p1 -b .keymouselistener-segfault
 %patch44 -p1 -b .tcp-wrappers
+%patch45 -p1 -b .cap-user-list-length
 
 %patch100 -p1 -b .change-defaults
 %patch101 -p1 -b .stupid-bullets
@@ -368,6 +372,9 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Mon Mar 10 2008 Ray Strode <rstrode@redhat.com> - 1:2.20.3-2
+- Cap user list to 1000 users (bug 383051)
+
 * Tue Jan 08 2008 - Bastien Nocera <bnocera@redhat.com> - 1:2.20.3-1
 - Update to 2.20.3
 - Remove obsolete patches
