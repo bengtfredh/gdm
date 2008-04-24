@@ -15,8 +15,8 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 2.20.3
-Release: 2%{?dist}
+Version: 2.20.5
+Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -372,6 +372,9 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Thu Apr 24 2008 Ray Strode <rstrode@redhat.com> - 1:2.20.5-1
+- update to 2.20.5 (may help with 372151)
+
 * Mon Mar 10 2008 Ray Strode <rstrode@redhat.com> - 1:2.20.3-2
 - Cap user list to 1000 users (bug 383051)
 
