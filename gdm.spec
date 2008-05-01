@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.21.10
-Release: 0.2008.04.28.1%{?dist}
+Release: 0.2008.05.01.1%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -75,7 +75,6 @@ BuildRequires: iso-codes-devel
 BuildRequires: gnome-panel-devel
 
 Requires: audit-libs >= %{libauditver}
-Patch0: ck-multi.patch
 Patch1: xkb-groups.patch
 Patch98: gdm-2.21.10-disable-debug-messages.patch
 Patch99: gdm-2.21.8-fedora-logo.patch
@@ -97,7 +96,6 @@ multiple simulanteous logged in users.
 
 %prep
 %setup -q
-%patch0 -p1 -b .ck-multi
 %patch1 -p1 -b .xkb-groups
 %patch98 -p1 -b .disable-debug-messages
 %patch99 -p1 -b .fedora-logo
@@ -297,6 +295,15 @@ fi
 %{_datadir}/gnome-2.0/ui/GNOME_FastUserSwitchApplet.xml
 
 %changelog
+* Thu May  1 2008 Ray Strode <rstrode@redhat.com> - 1:2.21.10-0.2008.05.01.1
+- ConsoleKit fixes
+- Don't show session selector if only one session installed
+- automatically pop up language/sesssion selectrs when using mnemonics
+- fix debugging
+- fix resettings slave after session migration
+- Desensitize power buttons briefly after page switch
+- Remove Users: label from greeter
+
 * Mon Apr 28 2008 Ray Strode <rstrode@redhat.com> - 1:2.21.10-0.2008.04.28.1
 - a11y improvements
 - make "Suspend" desensitize properly when not-available
