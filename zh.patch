@@ -1,0 +1,13 @@
+diff -up ./gdm-2.22.0/po/zh_CN.po.orig ./gdm-2.22.0/po/zh_CN.po
+--- ./gdm-2.22.0/po/zh_CN.po.orig	2008-05-09 10:23:29.000000000 +1000
++++ ./gdm-2.22.0/po/zh_CN.po	2008-05-09 10:24:05.000000000 +1000
+@@ -467,7 +467,7 @@ msgstr "%l:%M %p"
+ #.
+ #: ../gui/simple-greeter/gdm-greeter-login-window.c:713
+ msgid "%a %b %e"
+-msgstr "%b月%e日 星期%a"
++msgstr "%b%e日 星期%a"
+ 
+ #. translators: reverse the order of these arguments
+ #. *              if the time should come before the
+
