@@ -1,0 +1,20 @@
+diff -up gdm-2.22.0/gui/simple-greeter/gdm-option-widget.c.hidden-langs gdm-2.22.0/gui/simple-greeter/gdm-option-widget.c
+--- gdm-2.22.0/gui/simple-greeter/gdm-option-widget.c.hidden-langs      2008-05-09 23:42:37.000000000 -0400
++++ gdm-2.22.0/gui/simple-greeter/gdm-option-widget.c   2008-05-09 23:43:28.000000000 -0400
+@@ -617,13 +617,9 @@ path_is_separator (GdmOptionWidget *widg
+ static gboolean
+ gdm_option_widget_check_visibility (GdmOptionWidget *widget)
+ {
+-        int number_of_rows;
+-
+-        number_of_rows = widget->priv->number_of_top_rows +
+-                         widget->priv->number_of_middle_rows +
+-                         widget->priv->number_of_bottom_rows;
+-
+-        if (number_of_rows > 1) {
++        if (widget->priv->number_of_top_rows > 0 ||
++            widget->priv->number_of_middle_rows > 1 || 
++            widget->priv->number_of_bottom_rows > 0) {
+                 gtk_widget_show (widget->priv->items_combo_box);
+                 gtk_widget_show (widget->priv->label);
+

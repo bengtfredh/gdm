@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.22.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -79,6 +79,8 @@ Patch1: xkb-groups.patch
 Patch2: gdm-silence-debugging.patch
 # Fix Chinese date/time display (fixed in upstream svn)
 Patch3: zh.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=445631
+Patch4: gdm-2.22.0-fix-language-selector.patch
 Patch99: gdm-2.21.8-fedora-logo.patch
 
 %package user-switch-applet
@@ -101,6 +103,7 @@ multiple simulanteous logged in users.
 %patch1 -p1 -b .xkb-groups
 %patch2 -p1 -b .silence-debugging
 %patch3 -p1 -b .chinese-time
+%patch4 -p1 -b .fix-language-selector
 %patch99 -p1 -b .fedora-logo
 
 %build
@@ -298,6 +301,9 @@ fi
 %{_datadir}/gnome-2.0/ui/GNOME_FastUserSwitchApplet.xml
 
 %changelog
+* Sat May 10 2008 Ray Strode <rstrode@redhat.com> - 1:2.22.0-4
+- Patch from Matthias to fix language selector (bug 445631)
+
 * Fri May  9 2008 Matthias Clasen <mclasen@redhat.com> - 1:2.22.0-3
 - Fix Chinese date/time display (#445664)
 
