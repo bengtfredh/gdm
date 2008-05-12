@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.22.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -81,6 +81,8 @@ Patch2: gdm-silence-debugging.patch
 Patch3: zh.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=445631
 Patch4: gdm-2.22.0-fix-language-selector.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=445613
+Patch5: gdm-2.22.0-fix-pam-mkhomedir.patch
 Patch99: gdm-2.21.8-fedora-logo.patch
 
 %package user-switch-applet
@@ -104,6 +106,7 @@ multiple simulanteous logged in users.
 %patch2 -p1 -b .silence-debugging
 %patch3 -p1 -b .chinese-time
 %patch4 -p1 -b .fix-language-selector
+%patch5 -p1 -b .fix-pam-mkhomedir
 %patch99 -p1 -b .fedora-logo
 
 %build
@@ -301,6 +304,10 @@ fi
 %{_datadir}/gnome-2.0/ui/GNOME_FastUserSwitchApplet.xml
 
 %changelog
+* Mon May 12 2008 Ray Strode <rstrode@redhat.com> - 1:2.22.0-5
+- Don't require process to be running euid root when reading
+  ~/.dmrc (bug 445613)
+
 * Sat May 10 2008 Ray Strode <rstrode@redhat.com> - 1:2.22.0-4
 - Patch from Matthias to fix language selector (bug 445631)
 
