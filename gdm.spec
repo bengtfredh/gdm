@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.20.5
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -67,6 +67,9 @@ Patch44: gdm-2.18.4-tcp-wrappers.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=383051
 Patch45: gdm-2.20.3-cap-user-list-length.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=452567
+Patch46: gdm-2.20.5-fix-non-utf8.patch
 
 Patch100: gdm-2.20.2-change-defaults.patch
 Patch101: stupid-bullets.patch
@@ -158,6 +161,7 @@ Extra icons / faces for the GNOME Display Manager.
 %patch43 -p1 -b .keymouselistener-segfault
 %patch44 -p1 -b .tcp-wrappers
 %patch45 -p1 -b .cap-user-list-length
+%patch46 -p1 -b .fix-non-utf8
 
 %patch100 -p1 -b .change-defaults
 %patch101 -p1 -b .stupid-bullets
@@ -372,6 +376,9 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Mon Jun 23 2008 Ray Strode <rstrode@redhat.com> - 1:2.20.5-2
+- Attempt to fix crash with non-utf8 usernames (bug 452567)
+
 * Thu Apr 24 2008 Ray Strode <rstrode@redhat.com> - 1:2.20.5-1
 - update to 2.20.5 (may help with 372151)
 
