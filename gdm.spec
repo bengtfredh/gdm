@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.20.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -376,6 +376,10 @@ fi
 %{_datadir}/pixmaps/faces/extras/*.jpg
 
 %changelog
+* Wed Jun 25 2008 Ray Strode <rstrode@redhat.com> - 1:2.20.5-3
+- Fix bug in user capping code where it was adding a string to a
+  list of user objects
+
 * Mon Jun 23 2008 Ray Strode <rstrode@redhat.com> - 1:2.20.5-2
 - Attempt to fix crash with non-utf8 usernames (bug 452567)
 
