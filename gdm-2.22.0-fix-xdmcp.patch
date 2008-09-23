@@ -1,0 +1,51 @@
+Bug 446224 -  xdmcp broken in gdm
+
+"It seems gdm_manager_constructor is being called before manager->priv->xdmcp_enabled is
+configured, so manager->priv->xdmcp_factory is never set. I am attaching an
+illustrative patch which allows XDMCP to start listening."
+
+-- Patch by Michael Young
+
+https://bugzilla.redhat.com/show_bug.cgi?id=446224
+https://bugzilla.redhat.com/attachment.cgi?id=305955
+https://bugzilla.redhat.com/attachment.cgi?id=305245
+
+diff -Nurp gdm-2.22.0.orig/daemon/gdm-display.c gdm-2.22.0/daemon/gdm-display.c
+--- gdm-2.22.0.orig/daemon/gdm-display.c	2008-04-18 05:29:28.000000000 +0200
++++ gdm-2.22.0/daemon/gdm-display.c	2008-09-23 19:29:23.000000000 +0200
+@@ -465,7 +465,7 @@ gdm_display_real_manage (GdmDisplay *dis
+ 
+         g_assert (display->priv->slave_proxy == NULL);
+ 
+-        if (!gdm_display_create_authority (display)) {
++        if (display->priv->access_file == NULL && !gdm_display_create_authority (display)) {
+                 g_warning ("Unable to set up access control for display %d",
+                            display->priv->x11_display_number);
+                 return FALSE;
+diff -Nurp gdm-2.22.0.orig/daemon/gdm-manager.c gdm-2.22.0/daemon/gdm-manager.c
+--- gdm-2.22.0.orig/daemon/gdm-manager.c	2008-04-18 05:29:28.000000000 +0200
++++ gdm-2.22.0/daemon/gdm-manager.c	2008-09-23 19:29:42.000000000 +0200
+@@ -323,9 +323,9 @@ gdm_manager_constructor (GType          
+ 
+         manager->priv->local_factory = gdm_local_display_factory_new (manager->priv->display_store);
+ 
+-        if (manager->priv->xdmcp_enabled) {
++/*        if (manager->priv->xdmcp_enabled) { */
+                 manager->priv->xdmcp_factory = gdm_xdmcp_display_factory_new (manager->priv->display_store);
+-        }
++/*        } */
+ 
+         return G_OBJECT (manager);
+ }
+diff -Nurp gdm-2.22.0.orig/daemon/gdm-xdmcp-display-factory.c gdm-2.22.0/daemon/gdm-xdmcp-display-factory.c
+--- gdm-2.22.0.orig/daemon/gdm-xdmcp-display-factory.c	2008-04-18 05:29:28.000000000 +0200
++++ gdm-2.22.0/daemon/gdm-xdmcp-display-factory.c	2008-09-23 19:29:23.000000000 +0200
+@@ -2274,6 +2274,8 @@ gdm_xdmcp_handle_request (GdmXdmcpDispla
+                                 gsize   cookie_size;
+                                 char   *name;
+ 
++				gdm_display_create_authority (display);
++
+                                 gdm_display_get_x11_cookie (display, &cookie,
+                                                             &cookie_size, NULL);
+ 

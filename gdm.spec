@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.22.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -86,6 +86,8 @@ Patch5: gdm-2.22.0-fix-pam-mkhomedir.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=446672
 Patch6: gdm-2.22.0-enable-tcp.patch
 Patch7: gdm-2.22.0-fix-auto-login.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=446224
+Patch8: gdm-2.22.0-fix-xdmcp.patch
 Patch99: gdm-2.21.8-fedora-logo.patch
 
 %package user-switch-applet
@@ -112,6 +114,7 @@ multiple simulanteous logged in users.
 %patch5 -p1 -b .fix-pam-mkhomedir
 %patch6 -p1 -b .enable-tcp
 %patch7 -p1 -b .fix-auto-login
+%patch8 -p1 -b .fix-xdmcp
 %patch99 -p1 -b .fedora-logo
 
 %build
@@ -309,6 +312,9 @@ fi
 %{_datadir}/gnome-2.0/ui/GNOME_FastUserSwitchApplet.xml
 
 %changelog
+* Tue Sep 23 2008 Lubomir Rintel <lkundrak@v3.sk> - 1:2.22.0-9
+- Fix XDMCP, thanks to Michael Young (bug 446224)
+
 * Mon Jun 30 2008 Ray Strode <rstrode@redhat.com> - 1:2.22.0-8
 - Fix automatic login option fix
 
