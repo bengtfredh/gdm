@@ -289,6 +289,7 @@ fi
 %{_libexecdir}/gdm-product-slave
 %{_libexecdir}/gdm-session-worker
 %{_libexecdir}/gdm-simple-chooser
+%{_libexecdir}/gdm-simple-greeter
 %{_libexecdir}/gdm-simple-slave
 %{_libexecdir}/gdm-xdmcp-chooser-slave
 %{_sbindir}/gdm
