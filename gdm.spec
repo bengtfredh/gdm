@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.22.0
-Release: 9%{?dist}
+Release: 10%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -88,7 +88,14 @@ Patch6: gdm-2.22.0-enable-tcp.patch
 Patch7: gdm-2.22.0-fix-auto-login.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=446224
 Patch8: gdm-2.22.0-fix-xdmcp.patch
-Patch99: gdm-2.21.8-fedora-logo.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=449987
+Patch9: gdm-2.22.0-fix-homedir-crash.patch
+
+# Fix pulled from upstream, no bug number
+Patch10: gdm-2.22.0-fix-icon-scale.patch
+
+Patch99: gdm-2.22.0-fedora-logo.patch
 
 %package user-switch-applet
 Summary:   GDM User Switcher Panel Applet
@@ -115,6 +122,8 @@ multiple simulanteous logged in users.
 %patch6 -p1 -b .enable-tcp
 %patch7 -p1 -b .fix-auto-login
 %patch8 -p1 -b .fix-xdmcp
+%patch9 -p1 -b .fix-homedir-crash
+%patch10 -p1 -b .fix-icon-scale
 %patch99 -p1 -b .fedora-logo
 
 %build
@@ -280,7 +289,6 @@ fi
 %{_libexecdir}/gdm-product-slave
 %{_libexecdir}/gdm-session-worker
 %{_libexecdir}/gdm-simple-chooser
-%{_libexecdir}/gdm-simple-greeter
 %{_libexecdir}/gdm-simple-slave
 %{_libexecdir}/gdm-xdmcp-chooser-slave
 %{_sbindir}/gdm
@@ -312,6 +320,12 @@ fi
 %{_datadir}/gnome-2.0/ui/GNOME_FastUserSwitchApplet.xml
 
 %changelog
+* Mon Sep 29 2008 Ray Strode <rstrode@redhat.com> - 1:2.22.0-10
+- Add patch from Danny Baumann/Avi Kivity to fix crasher when
+  homedir is on unknown filesystem (bug 449987)
+- Make icon scale with font size (patch from upstream)
+- update logo patch to use some new gconf paths
+
 * Tue Sep 23 2008 Lubomir Rintel <lkundrak@v3.sk> - 1:2.22.0-9
 - Fix XDMCP, thanks to Michael Young (bug 446224)
 

@@ -1,0 +1,13 @@
+--- gdm/gui/simple-greeter/gdm-user.c.orig  2008-06-04 17:56:57.000000000 +0200
++++ gdm/gui/simple-greeter/gdm-user.c       2008-06-04 18:00:05.000000000 +0200
+@@ -750,7 +750,8 @@
+                 }
+                 filesystem_type = g_file_info_get_attribute_string (file_info,
+                                                                     G_FILE_ATTRIBUTE_FILESYSTEM_TYPE);
+-                is_local = ((strcmp (filesystem_type, "nfs") != 0) &&
++                is_local = ((filesystem_type != NULL) &&
++                           (strcmp (filesystem_type, "nfs") != 0) &&
+                             (strcmp (filesystem_type, "afs") != 0) &&
+                             (strcmp (filesystem_type, "autofs") != 0) &&
+                             (strcmp (filesystem_type, "unknown") != 0) &&
+
