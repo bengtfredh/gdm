@@ -1,0 +1,91 @@
+diff -up gdm-2.24.0/daemon/gdm-session-linux-auditor.c.audit-logout gdm-2.24.0/daemon/gdm-session-linux-auditor.c
+--- gdm-2.24.0/daemon/gdm-session-linux-auditor.c.audit-logout	2008-07-10 11:07:42.000000000 -0400
++++ gdm-2.24.0/daemon/gdm-session-linux-auditor.c	2008-11-06 22:01:41.000000000 -0500
+@@ -45,8 +45,9 @@ static void gdm_session_linux_auditor_fi
+ G_DEFINE_TYPE (GdmSessionLinuxAuditor, gdm_session_linux_auditor, GDM_TYPE_SESSION_AUDITOR)
+ 
+ static void
+-gdm_session_linux_auditor_report_login_attempt (GdmSessionAuditor *auditor,
+-                                                gboolean           was_successful)
++log_user_message (GdmSessionAuditor *auditor,
++                  gint               type,
++                  gint               result)
+ {
+         GdmSessionLinuxAuditor   *linux_auditor;
+         char                      buf[512];
+@@ -70,14 +71,14 @@ gdm_session_linux_auditor_report_login_a
+ 
+         if (pw != NULL) {
+                 g_snprintf (buf, sizeof (buf), "uid=%d", pw->pw_uid);
+-                audit_log_user_message (linux_auditor->priv->audit_fd, AUDIT_USER_LOGIN,
++                audit_log_user_message (linux_auditor->priv->audit_fd, type,
+                                         buf, hostname, NULL, display_device,
+-                                        was_successful != FALSE);
++                                        result);
+         } else {
+                 g_snprintf (buf, sizeof (buf), "acct=%s", username);
+-                audit_log_user_message (linux_auditor->priv->audit_fd, AUDIT_USER_LOGIN,
++                audit_log_user_message (linux_auditor->priv->audit_fd, type,
+                                         buf, hostname, NULL, display_device,
+-                                        was_successful != FALSE);
++                                        result);
+         }
+ 
+         g_free (username);
+@@ -88,7 +89,7 @@ gdm_session_linux_auditor_report_login_a
+ static void
+ gdm_session_linux_auditor_report_login (GdmSessionAuditor *auditor)
+ {
+-        gdm_session_linux_auditor_report_login_attempt (auditor, TRUE);
++        log_user_message (auditor, AUDIT_USER_LOGIN, 1);
+ }
+ 
+ static void
+@@ -96,8 +97,13 @@ gdm_session_linux_auditor_report_login_f
+                                                   int                pam_error_code,
+                                                   const char        *pam_error_string)
+ {
++        log_user_message (auditor, AUDIT_USER_LOGIN, 0);
++}
+ 
+-        gdm_session_linux_auditor_report_login_attempt (auditor, FALSE);
++static void
++gdm_session_linux_auditor_report_logout (GdmSessionAuditor *auditor)
++{
++        log_user_message (auditor, AUDIT_USER_LOGOUT, 1);
+ }
+ 
+ static void
+@@ -113,6 +119,7 @@ gdm_session_linux_auditor_class_init (Gd
+ 
+         auditor_class->report_login = gdm_session_linux_auditor_report_login;
+         auditor_class->report_login_failure = gdm_session_linux_auditor_report_login_failure;
++        auditor_class->report_logout = gdm_session_linux_auditor_report_logout;
+ 
+         g_type_class_add_private (auditor_class, sizeof (GdmSessionLinuxAuditorPrivate));
+ }
+diff -up gdm-2.24.0/daemon/gdm-session-worker.c.audit-logout gdm-2.24.0/daemon/gdm-session-worker.c
+--- gdm-2.24.0/daemon/gdm-session-worker.c.audit-logout	2008-11-07 12:25:27.000000000 -0500
++++ gdm-2.24.0/daemon/gdm-session-worker.c	2008-11-07 12:26:43.000000000 -0500
+@@ -974,10 +974,6 @@ gdm_session_worker_uninitialize_pam (Gdm
+         if (worker->priv->pam_handle == NULL)
+                 return;
+ 
+-        if (worker->priv->state >= GDM_SESSION_WORKER_STATE_ACCREDITED) {
+-                pam_setcred (worker->priv->pam_handle, PAM_DELETE_CRED);
+-        }
+-
+         if (worker->priv->state >= GDM_SESSION_WORKER_STATE_SESSION_OPENED) {
+                 pam_close_session (worker->priv->pam_handle, 0);
+                 gdm_session_auditor_report_logout (worker->priv->auditor);
+@@ -987,6 +983,10 @@ gdm_session_worker_uninitialize_pam (Gdm
+                                                           pam_strerror (worker->priv->pam_handle, status));
+         }
+ 
++        if (worker->priv->state >= GDM_SESSION_WORKER_STATE_ACCREDITED) {
++                pam_setcred (worker->priv->pam_handle, PAM_DELETE_CRED);
++        }
++
+         pam_end (worker->priv->pam_handle, status);
+         worker->priv->pam_handle = NULL;
+ 

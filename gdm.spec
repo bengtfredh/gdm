@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.24.0
-Release: 11%{?dist}
+Release: 12%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -104,6 +104,9 @@ Patch12: gdm-user-switcher-no-help.patch
 # should probably be changed to get the system layout from the X server
 Patch13: gdm-system-keyboard.patch
 
+# fixed upstream
+Patch14: gdm-audit-logout.patch
+
 # Fedora-specific
 Patch99: gdm-2.23.1-fedora-logo.patch
 
@@ -137,6 +140,7 @@ multiple simulanteous logged in users.
 %patch11 -p1 -b .add-panel-slide
 %patch12 -p1 -b .no-help
 %patch13 -p1 -b .system-keyboard
+%patch14 -p1 -b .audit-logout
 
 %patch99 -p1 -b .fedora-logo
 
@@ -352,6 +356,9 @@ fi
 %{_datadir}/gnome-2.0/ui/GNOME_FastUserSwitchApplet.xml
 
 %changelog
+* Fri Nov  7 2008 Matthias Clasen  <mclasen@redhat.com> - 1:2.24.0-12
+- Make logout auditing work (#470269)
+
 * Mon Oct 20 2008 Matthias Clasen  <mclasen@redhat.com> - 1:2.24.0-11
 - Respect system keyboard setting
 
