@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.24.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -86,6 +86,9 @@ Patch3: gdm-2.23.92-save-root-window.patch
 # uses /etc/sysconfig/keyboard and is thus not directly upstreamable
 # should probably be changed to get the system layout from the X server
 Patch13: gdm-system-keyboard.patch
+
+# http://bugzilla.gnome.org/561396
+Patch14: gdm-2.24.0-fix-xdmcp.patch
 
 # Fedora-specific
 Patch99: gdm-2.23.1-fedora-logo.patch
@@ -326,6 +329,9 @@ fi
 %{_datadir}/gnome-2.0/ui/GNOME_FastUserSwitchApplet.xml
 
 %changelog
+* Fri Dec  5 2008 Ray Strode <rstrode@redhat.com> - 1:2.24.1-2
+- Add patch from upstream bug 561396 to fix some xdmcp issues
+
 * Fri Nov 18 2008 Jon McCann  <jmccann@redhat.com> - 1:2.24.1-1
 - Update to 2.24.1
 
