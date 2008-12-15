@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.24.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -115,6 +115,7 @@ multiple simulanteous logged in users.
 %patch3 -p1 -b .save-root-window
 
 %patch13 -p1 -b .system-keyboard
+%patch14 -p1 -b .fix-xdmcp
 %patch99 -p1 -b .fedora-logo
 
 autoreconf
@@ -329,6 +330,9 @@ fi
 %{_datadir}/gnome-2.0/ui/GNOME_FastUserSwitchApplet.xml
 
 %changelog
+* Mon Dec 15 2008 Ray Strode <rstrode@redhat.com> - 1:2.24.1-3
+- actually add patch (bug 476061)
+
 * Fri Dec  5 2008 Ray Strode <rstrode@redhat.com> - 1:2.24.1-2
 - Add patch from upstream bug 561396 to fix some xdmcp issues
 
