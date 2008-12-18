@@ -27,9 +27,10 @@ Date:   Wed Dec 3 01:49:35 2008 +0000
 
 diff --git a/daemon/gdm-display.c b/daemon/gdm-display.c
 index d1c0580..1bca58d 100644
---- a/daemon/gdm-display.c
-+++ b/daemon/gdm-display.c
-@@ -542,7 +542,7 @@ _gdm_display_set_status (GdmDisplay *display,
+diff -up gdm-2.24.1/daemon/gdm-display.c.fix-xdmcp gdm-2.24.1/daemon/gdm-display.c
+--- gdm-2.24.1/daemon/gdm-display.c.fix-xdmcp	2008-12-15 22:41:23.000000000 +0000
++++ gdm-2.24.1/daemon/gdm-display.c	2008-12-15 22:45:40.000000000 +0000
+@@ -458,7 +458,7 @@ _gdm_display_set_status (GdmDisplay *dis
  }
  
  static gboolean
@@ -38,7 +39,7 @@ index d1c0580..1bca58d 100644
  {
          char *command;
          char *log_file;
-@@ -550,7 +550,7 @@ gdm_display_real_manage (GdmDisplay *display)
+@@ -466,7 +466,7 @@ gdm_display_real_manage (GdmDisplay *dis
  
          g_return_val_if_fail (GDM_IS_DISPLAY (display), FALSE);
  
@@ -47,7 +48,7 @@ index d1c0580..1bca58d 100644
  
          g_assert (display->priv->slave_proxy == NULL);
  
-@@ -560,7 +560,7 @@ gdm_display_real_manage (GdmDisplay *display)
+@@ -476,7 +476,7 @@ gdm_display_real_manage (GdmDisplay *dis
                  return FALSE;
          }
  
@@ -56,7 +57,7 @@ index d1c0580..1bca58d 100644
  
          display->priv->slave_proxy = gdm_slave_proxy_new ();
          g_signal_connect (display->priv->slave_proxy,
-@@ -584,6 +584,48 @@ gdm_display_real_manage (GdmDisplay *display)
+@@ -501,6 +501,48 @@ gdm_display_real_manage (GdmDisplay *dis
          gdm_slave_proxy_set_command (display->priv->slave_proxy, command);
          g_free (command);
  
@@ -105,19 +106,18 @@ index d1c0580..1bca58d 100644
          g_timer_start (display->priv->slave_timer);
  
          gdm_slave_proxy_start (display->priv->slave_proxy);
-@@ -985,6 +1027,7 @@ gdm_display_class_init (GdmDisplayClass *klass)
+@@ -914,6 +956,7 @@ gdm_display_class_init (GdmDisplayClass 
+         klass->add_user_authorization = gdm_display_real_add_user_authorization;
          klass->remove_user_authorization = gdm_display_real_remove_user_authorization;
          klass->set_slave_bus_name = gdm_display_real_set_slave_bus_name;
-         klass->get_timed_login_details = gdm_display_real_get_timed_login_details;
 +        klass->prepare = gdm_display_real_prepare;
          klass->manage = gdm_display_real_manage;
          klass->finish = gdm_display_real_finish;
          klass->unmanage = gdm_display_real_unmanage;
-diff --git a/daemon/gdm-display.h b/daemon/gdm-display.h
-index 7e64012..2914c81 100644
---- a/daemon/gdm-display.h
-+++ b/daemon/gdm-display.h
-@@ -38,6 +38,7 @@ typedef struct GdmDisplayPrivate GdmDisplayPrivate;
+diff -up gdm-2.24.1/daemon/gdm-display.h.fix-xdmcp gdm-2.24.1/daemon/gdm-display.h
+--- gdm-2.24.1/daemon/gdm-display.h.fix-xdmcp	2008-11-18 22:38:44.000000000 +0000
++++ gdm-2.24.1/daemon/gdm-display.h	2008-12-15 22:41:23.000000000 +0000
+@@ -38,6 +38,7 @@ typedef struct GdmDisplayPrivate GdmDisp
  
  typedef enum {
          GDM_DISPLAY_UNMANAGED = 0,
@@ -133,7 +133,7 @@ index 7e64012..2914c81 100644
          gboolean (*manage)                    (GdmDisplay *display);
          gboolean (*finish)                    (GdmDisplay *display);
          gboolean (*unmanage)                  (GdmDisplay *display);
-@@ -90,6 +92,7 @@ time_t              gdm_display_get_creation_time              (GdmDisplay *disp
+@@ -86,6 +88,7 @@ time_t              gdm_display_get_crea
  char *              gdm_display_get_user_auth                  (GdmDisplay *display);
  
  gboolean            gdm_display_create_authority               (GdmDisplay *display);
@@ -141,11 +141,10 @@ index 7e64012..2914c81 100644
  gboolean            gdm_display_manage                         (GdmDisplay *display);
  gboolean            gdm_display_finish                         (GdmDisplay *display);
  gboolean            gdm_display_unmanage                       (GdmDisplay *display);
-diff --git a/daemon/gdm-local-display-factory.c b/daemon/gdm-local-display-factory.c
-index 72a2f4a..3984ada 100644
---- a/daemon/gdm-local-display-factory.c
-+++ b/daemon/gdm-local-display-factory.c
-@@ -324,6 +324,8 @@ on_static_display_status_changed (GdmDisplay             *display,
+diff -up gdm-2.24.1/daemon/gdm-local-display-factory.c.fix-xdmcp gdm-2.24.1/daemon/gdm-local-display-factory.c
+--- gdm-2.24.1/daemon/gdm-local-display-factory.c.fix-xdmcp	2008-11-18 22:38:44.000000000 +0000
++++ gdm-2.24.1/daemon/gdm-local-display-factory.c	2008-12-15 22:41:23.000000000 +0000
+@@ -324,6 +324,8 @@ on_static_display_status_changed (GdmDis
                  break;
          case GDM_DISPLAY_UNMANAGED:
                  break;
@@ -154,10 +153,9 @@ index 72a2f4a..3984ada 100644
          case GDM_DISPLAY_MANAGED:
                  break;
          default:
-diff --git a/daemon/gdm-manager.c b/daemon/gdm-manager.c
-index d87e82e..4def8b6 100644
---- a/daemon/gdm-manager.c
-+++ b/daemon/gdm-manager.c
+diff -up gdm-2.24.1/daemon/gdm-manager.c.fix-xdmcp gdm-2.24.1/daemon/gdm-manager.c
+--- gdm-2.24.1/daemon/gdm-manager.c.fix-xdmcp	2008-11-18 22:38:44.000000000 +0000
++++ gdm-2.24.1/daemon/gdm-manager.c	2008-12-15 22:41:23.000000000 +0000
 @@ -61,6 +61,7 @@ struct GdmManagerPrivate
  #endif
          gboolean                xdmcp_enabled;
@@ -166,7 +164,7 @@ index d87e82e..4def8b6 100644
          gboolean                wait_for_go;
          gboolean                no_console;
  
-@@ -138,9 +139,27 @@ gdm_manager_get_displays (GdmManager *manager,
+@@ -138,9 +139,27 @@ gdm_manager_get_displays (GdmManager *ma
  }
  
  void
@@ -204,7 +202,7 @@ index d87e82e..4def8b6 100644
  }
  
  void
-@@ -271,7 +292,24 @@ gdm_manager_set_xdmcp_enabled (GdmManager *manager,
+@@ -271,7 +292,24 @@ gdm_manager_set_xdmcp_enabled (GdmManage
  {
          g_return_if_fail (GDM_IS_MANAGER (manager));
  
@@ -230,11 +228,10 @@ index d87e82e..4def8b6 100644
  }
  
  static void
-diff --git a/daemon/gdm-manager.h b/daemon/gdm-manager.h
-index 0b2a04e..c479d93 100644
---- a/daemon/gdm-manager.h
-+++ b/daemon/gdm-manager.h
-@@ -63,6 +63,7 @@ GType               gdm_manager_get_type                       (void);
+diff -up gdm-2.24.1/daemon/gdm-manager.h.fix-xdmcp gdm-2.24.1/daemon/gdm-manager.h
+--- gdm-2.24.1/daemon/gdm-manager.h.fix-xdmcp	2008-11-18 22:38:44.000000000 +0000
++++ gdm-2.24.1/daemon/gdm-manager.h	2008-12-15 22:41:23.000000000 +0000
+@@ -63,6 +63,7 @@ GType               gdm_manager_get_type
  
  GdmManager *        gdm_manager_new                            (void);
  void                gdm_manager_start                          (GdmManager *manager);
@@ -242,11 +239,10 @@ index 0b2a04e..c479d93 100644
  void                gdm_manager_set_wait_for_go                (GdmManager *manager,
                                                                  gboolean    wait_for_go);
  
-diff --git a/daemon/gdm-xdmcp-display-factory.c b/daemon/gdm-xdmcp-display-factory.c
-index 57695a1..58cdf59 100644
---- a/daemon/gdm-xdmcp-display-factory.c
-+++ b/daemon/gdm-xdmcp-display-factory.c
-@@ -2041,6 +2041,13 @@ gdm_xdmcp_display_create (GdmXdmcpDisplayFactory *factory,
+diff -up gdm-2.24.1/daemon/gdm-xdmcp-display-factory.c.fix-xdmcp gdm-2.24.1/daemon/gdm-xdmcp-display-factory.c
+--- gdm-2.24.1/daemon/gdm-xdmcp-display-factory.c.fix-xdmcp	2008-11-18 22:38:44.000000000 +0000
++++ gdm-2.24.1/daemon/gdm-xdmcp-display-factory.c	2008-12-15 22:41:23.000000000 +0000
+@@ -2041,6 +2041,13 @@ gdm_xdmcp_display_create (GdmXdmcpDispla
                  goto out;
          }
  
@@ -260,7 +256,7 @@ index 57695a1..58cdf59 100644
          store = gdm_display_factory_get_display_store (GDM_DISPLAY_FACTORY (factory));
          gdm_display_store_add (store, display);
  
-@@ -2507,7 +2514,7 @@ gdm_xdmcp_handle_manage (GdmXdmcpDisplayFactory *factory,
+@@ -2507,7 +2514,7 @@ gdm_xdmcp_handle_manage (GdmXdmcpDisplay
  
          display = gdm_xdmcp_display_lookup (factory, clnt_sessid);
          if (display != NULL &&
