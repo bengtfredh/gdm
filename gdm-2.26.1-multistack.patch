@@ -18046,3 +18046,16 @@ index cb84f01..7173080 100644
 -- 
 1.6.2.2
 
+diff --git a/daemon/gdm-session-worker-job.c b/daemon/gdm-session-worker-job.c
+index 0327d77..ad7cbac 100644
+--- a/daemon/gdm-session-worker-job.c
++++ b/daemon/gdm-session-worker-job.c
+@@ -325,6 +325,8 @@ gdm_session_worker_job_stop (GdmSessionWorkerJob *session_worker_job)
+         if (res < 0) {
+                 g_warning ("Unable to kill session worker process");
+         } else {
++                g_usleep (G_USEC_PER_SEC / 2);
++                gdm_signal_pid (session_worker_job->priv->pid, SIGKILL);
+                 session_worker_job_died (session_worker_job);
+         }
+ 
