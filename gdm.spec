@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.26.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -98,6 +98,9 @@ Patch13: gdm-system-keyboard.patch
 
 Patch19: gdm-2.26.1-multistack.patch
 
+# http://bugzilla.gnome.org/show_bug.cgi?id=580189
+Patch20: session-client.patch
+
 # Fedora-specific
 Patch99: gdm-2.23.1-fedora-logo.patch
 
@@ -139,6 +142,8 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch13 -p1 -b .system-keyboard
 
 %patch19 -p1 -b .multistack
+
+%patch20 -p1 -b .session-client
 
 %patch99 -p1 -b .fedora-logo
 
@@ -380,6 +385,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Fri Apr 24 2009 Matthias Clasen <mclasen@redhat.com> - 1:2.26.1-4
+- Make the greeter a well-behaved session client (#495738)
+
 * Wed Apr 22 2009 Ray Strode <rstrode@redhat.com> - 1:2.26.1-3
 - Add temporary hack to smack down misbehaving PAM modules
 
