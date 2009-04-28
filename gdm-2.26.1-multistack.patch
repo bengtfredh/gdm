@@ -6381,7 +6381,7 @@ index 0f7e44e..e5296a4 100644
  {
          g_debug ("GdmSessionDirect: Worker job exited: %d", code);
  
-+        g_object_ref (conversation);
++        g_object_ref (conversation->job);
          if (!conversation->session->priv->is_authenticated) {
                  char *msg;
  
@@ -6393,7 +6393,7 @@ index 0f7e44e..e5296a4 100644
 +        g_debug ("GdmSessionDirect: Emitting conversation-stopped signal");
 +        _gdm_session_conversation_stopped (GDM_SESSION (conversation->session),
 +                                           conversation->service_name);
-+        g_object_unref (conversation);
++        g_object_unref (conversation->job);
  }
  
  static void
@@ -6401,7 +6401,7 @@ index 0f7e44e..e5296a4 100644
  {
          g_debug ("GdmSessionDirect: Worker job died: %d", signum);
  
-+        g_object_ref (conversation);
++        g_object_ref (conversation->job);
          if (!conversation->session->priv->is_authenticated) {
                  char *msg;
  
@@ -6413,7 +6413,7 @@ index 0f7e44e..e5296a4 100644
 +        g_debug ("GdmSessionDirect: Emitting conversation-stopped signal");
 +        _gdm_session_conversation_stopped (GDM_SESSION (conversation->session),
 +                                           conversation->service_name);
-+        g_object_unref (conversation);
++        g_object_unref (conversation->job);
  }
  
  static GdmSessionConversation *
