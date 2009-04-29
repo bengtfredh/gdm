@@ -1,0 +1,20 @@
+--- gdm-2.26.1/daemon/gdm-xdmcp-display-factory.c.orig	2009-03-16 20:12:08.000000000 +0000
++++ gdm-2.26.1/daemon/gdm-xdmcp-display-factory.c	2009-04-23 11:49:50.000000000 +0100
+@@ -2309,8 +2309,6 @@
+                                 authorization_data.data     = (CARD8 *) cookie->data;
+                                 authorization_data.length   = cookie->len;
+ 
+-                                g_array_free (cookie, TRUE);
+-
+                                 /* the addrs are NOT copied */
+                                 gdm_xdmcp_send_accept (factory,
+                                                        address,
+@@ -2319,6 +2317,8 @@
+                                                        &authentication_data,
+                                                        &authorization_name,
+                                                        &authorization_data);
++
++                                g_array_free (cookie, TRUE);
+                         }
+                 }
+         } else {
