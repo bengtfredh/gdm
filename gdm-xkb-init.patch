@@ -1,0 +1,15 @@
+diff -up gdm-2.26.1/gui/simple-greeter/gdm-layouts.c.xkb-init gdm-2.26.1/gui/simple-greeter/gdm-layouts.c
+--- gdm-2.26.1/gui/simple-greeter/gdm-layouts.c.xkb-init	2009-04-29 21:27:20.129995831 -0400
++++ gdm-2.26.1/gui/simple-greeter/gdm-layouts.c	2009-04-29 21:28:12.378737969 -0400
+@@ -55,9 +55,9 @@ init_xkl (void)
+                 xkl_config_registry_load (config_registry);
+ 
+                 initial_config = xkl_config_rec_new ();
+-                if (!xkl_config_rec_get_from_backup (initial_config, engine)) {
++                if (!xkl_config_rec_get_from_server (initial_config, engine)) {
+                         g_warning ("failed to load XKB configuration");
+-                        initial_config->model = g_strdup ("pc105");
++                        initial_config->model = g_strdup ("evdev");
+                 }
+         }
+ }

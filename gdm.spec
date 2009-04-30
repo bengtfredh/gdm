@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.26.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -92,9 +92,8 @@ Requires: audit-libs >= %{libauditver}
 Patch2: gdm-2.26.0-force-active-vt.patch
 Patch3: gdm-2.23.92-save-root-window.patch
 
-# uses /etc/sysconfig/keyboard and is thus not directly upstreamable
-# should probably be changed to get the system layout from the X server
 Patch13: gdm-system-keyboard.patch
+Patch14: gdm-xkb-init.patch
 
 Patch19: gdm-2.26.1-multistack.patch
 
@@ -143,6 +142,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch2 -p1 -b .force-active-vt
 %patch3 -p1 -b .save-root-window
 %patch13 -p1 -b .system-keyboard
+%patch14 -p1 -b .xkb-init
 
 %patch19 -p1 -b .multistack
 
@@ -390,6 +390,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Wed Apr 29 2009 Matthias Clasen <mclasen@redhat.com> - 1:2.26.1-7
+- Don't rely on _BACKUP property for xkb initialization
+
 * Tue Apr 28 2009 Matthias Clasen <mclasen@redhat.com> - 1:2.26.1-6
 - fix a use-after-free in XDMCP code paths (#496882)
 
