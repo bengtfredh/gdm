@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.26.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -103,6 +103,9 @@ Patch20: session-client.patch
 # fixed upstream
 Patch21: xdmcp-use-after-free.patch
 
+# http://bugzilla.redhat.com/499272 43b1084d52892fffea7f2e6cd3731ad2a46b52bd
+Patch22: gdm-2.26.1-set-auth-flag.patch
+
 # Fedora-specific
 Patch99: gdm-2.23.1-fedora-logo.patch
 
@@ -147,8 +150,8 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch19 -p1 -b .multistack
 
 %patch20 -p1 -b .session-client
-
 %patch21 -p1 -b .xdmcp-use-after-free
+%patch22 -p1 -b .set-auth-flag
 
 %patch99 -p1 -b .fedora-logo
 
@@ -390,6 +393,10 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Thu May 07 2009 Ray Strode <rstrode@redhat.com> - 1:2.26.1-8
+- Hopefully fix bug 499272 (weird behavior when typing
+  init 3 from within the session)
+
 * Wed Apr 29 2009 Matthias Clasen <mclasen@redhat.com> - 1:2.26.1-7
 - Don't rely on _BACKUP property for xkb initialization
 
