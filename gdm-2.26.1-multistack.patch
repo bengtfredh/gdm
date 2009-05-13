@@ -1,7 +1,7 @@
 From b96b21d5497ce4ed3b362f4dc09b2f5fd654f3a3 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Fri, 20 Feb 2009 13:52:19 -0500
-Subject: [PATCH 01/33] Add a comment marking protected api in chooser
+Subject: [PATCH 01/34] Add a comment marking protected api in chooser
 
 The chooser widget has methods that only its
 subclasses are supposed to call.  We should
@@ -30,7 +30,7 @@ index 578e613..7e3e59c 100644
 From fafe68243000a7b2f97086daa3d4ad651e7ac905 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Fri, 6 Feb 2009 17:44:37 -0500
-Subject: [PATCH 02/33] Drop duplicated entry introspection output
+Subject: [PATCH 02/34] Drop duplicated entry introspection output
 
 ---
  daemon/gdm-greeter-server.c |    1 -
@@ -55,7 +55,7 @@ index 2e01d33..cecce83 100644
 From 4dc394bb5b87d3cbead40bb6565eec75d755ddae Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Mon, 2 Mar 2009 10:07:03 -0500
-Subject: [PATCH 03/33] Make lookup_item not warn when passing NULL for args
+Subject: [PATCH 03/34] Make lookup_item not warn when passing NULL for args
 
 gtk_tree_model_get doesn't like NULL, and we allow
 NULL for optional return values.
@@ -116,7 +116,7 @@ index f0298c6..b1ba9b4 100644
 From c68b126096e04b3b963a10658d5a835ab716599f Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Fri, 6 Feb 2009 15:35:00 -0500
-Subject: [PATCH 04/33] Drop "stopped" signal from worker-job class
+Subject: [PATCH 04/34] Drop "stopped" signal from worker-job class
 
 It was unused, dead code.
 ---
@@ -212,7 +212,7 @@ index d42eb37..5ad1c92 100644
 From b1fbbdad6d4fd847b248aaad7eec9a8730714b06 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Fri, 16 Jan 2009 11:00:08 -0500
-Subject: [PATCH 05/33] Drop session "Open" in favor of "StartConversation"
+Subject: [PATCH 05/34] Drop session "Open" in favor of "StartConversation"
 
 We want to eventually support having multiple
 simultaneous PAM conversations in one login
@@ -1420,7 +1420,7 @@ index c6a158c..d9fa26e 100644
 From 2e566b37c2b17117a70d1fa4c9e97cfdfeb27e75 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Wed, 4 Feb 2009 10:55:03 -0500
-Subject: [PATCH 06/33] Rename session worker to the service it's managing
+Subject: [PATCH 06/34] Rename session worker to the service it's managing
 
 This way when we're running multiple PAM conversations at once
 it will be obvious which worker is managing which conversation.
@@ -1609,7 +1609,7 @@ index d24f025..4833f23 100644
 From cb5359d77225d4cada0664504ef48f47cee49601 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Fri, 16 Jan 2009 13:01:48 -0500
-Subject: [PATCH 07/33] Make greeter explicitly request PAM conversation
+Subject: [PATCH 07/34] Make greeter explicitly request PAM conversation
 
 Now the greeter has to say what PAM stack it wants the slave to
 run.  When that stack is ready, we emit the Ready signal as
@@ -1955,7 +1955,7 @@ index 17afb4e..40d5e1f 100644
 From 312dc5d4950e91983113ac5e482d6a57b1a31258 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Fri, 16 Jan 2009 15:18:31 -0500
-Subject: [PATCH 08/33] Store multiple conversations in the session
+Subject: [PATCH 08/34] Store multiple conversations in the session
 
 We keep multiple conversations in the session now, keyed off of
 PAM service is at the other end.  Much of the guts still
@@ -2223,7 +2223,7 @@ index 0a71512..4bb14f4 100644
 From 96270a54f06f565aafad25ef9d961c16774b8e1b Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Wed, 4 Mar 2009 22:09:21 -0500
-Subject: [PATCH 09/33] start autologin conversation when creating session if necessary
+Subject: [PATCH 09/34] start autologin conversation when creating session if necessary
 
 Without this autologin breaks, since when it comes time to
 autologin, there's no worker to do it.
@@ -2261,7 +2261,7 @@ index 732c085..30faaa6 100644
 From 736b134ce488097d962afc2e322288557ce5fda4 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Thu, 22 Jan 2009 08:52:01 -0500
-Subject: [PATCH 10/33] Propagate service name to more layers
+Subject: [PATCH 10/34] Propagate service name to more layers
 
 This is more prep work to get multiple concurrent
 PAM stacks going.
@@ -6303,7 +6303,7 @@ index 40d5e1f..ca6fb4f 100644
 From 75d9abdf87e20d4382882f47f1434381f0a944bf Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Sat, 7 Feb 2009 11:36:40 -0500
-Subject: [PATCH 11/33] emit "ConversationStopped" signal at end of conv
+Subject: [PATCH 11/34] emit "ConversationStopped" signal at end of conv
 
 This will allow us to track when individual
 PAM conversations fail, instead of doing one
@@ -6654,7 +6654,7 @@ index e18f907..d08613f 100644
 From 66e8c2a4e38fc9bdd60b83c9bed480ed3bc90358 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Mon, 9 Mar 2009 15:41:12 -0400
-Subject: [PATCH 12/33] Don't tear down greeter until pam_open_session finishes
+Subject: [PATCH 12/34] Don't tear down greeter until pam_open_session finishes
 
 Some PAM modules ask questions at that late stage of the game,
 and so we need a greeter to forward the questions on to the
@@ -7233,7 +7233,7 @@ index d08613f..17f5f7a 100644
 From 61199d66b2ea68ae38215cf614e897c86f1abf1a Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Fri, 30 Jan 2009 23:57:31 -0500
-Subject: [PATCH 13/33] Add limited support for multiple pam stacks
+Subject: [PATCH 13/34] Add limited support for multiple pam stacks
 
 This hard codes 3 pam stacks and doesn't handle
 switching between them very well yet.
@@ -7990,7 +7990,7 @@ index 0000000..ade21b6
 From 1411345bfefbba0c1213152fdf890b5691661bd5 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Fri, 6 Mar 2009 11:19:40 -0500
-Subject: [PATCH 14/33] Create session settings object when first starting worker
+Subject: [PATCH 14/34] Create session settings object when first starting worker
 
 This is because one PAM module may complete before setup
 gets called on another, and when one completes *all* PAM
@@ -8028,7 +8028,7 @@ index b470d88..33706d7 100644
 From 2d2ad2f1ff74adf42bbe00fc650676f7816a644a Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Thu, 5 Feb 2009 15:20:25 -0500
-Subject: [PATCH 15/33] Queue a greeter reset when the user clicks cancel
+Subject: [PATCH 15/34] Queue a greeter reset when the user clicks cancel
 
 ---
  daemon/gdm-simple-slave.c |   37 +++++++++++++++++++++++++++++++++++++
@@ -8167,7 +8167,7 @@ index 17f5f7a..09a7425 100644
 From 5231302bd0b9611984639530884b14e6400e786f Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Fri, 6 Feb 2009 16:23:48 -0500
-Subject: [PATCH 16/33] Add a plugin based extension system to greeter
+Subject: [PATCH 16/34] Add a plugin based extension system to greeter
 
 This allows plugins to drive which PAM conversations
 get run.  This commit just adds one plugin "password"
@@ -12348,7 +12348,7 @@ index 0000000..9b87c67
 From ff3ec0b56e8343b86eec5edf9399ff12826cf861 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Sat, 7 Feb 2009 21:17:49 -0500
-Subject: [PATCH 17/33] Force session reset if all PAM conversations fail
+Subject: [PATCH 17/34] Force session reset if all PAM conversations fail
 
 ---
  gui/simple-greeter/gdm-greeter-login-window.c |   22 +++++++++++++++++++---
@@ -12407,7 +12407,7 @@ index 2e9a1a0..92a4c85 100644
 From 619749c673af1404da29c82504a42f85f0f05be7 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Wed, 18 Feb 2009 12:32:39 -0500
-Subject: [PATCH 18/33] Add a way for plugins to pick users from list
+Subject: [PATCH 18/34] Add a way for plugins to pick users from list
 
 The smartcard plugin is going to want to
 start its conversation as soon as the card
@@ -12564,7 +12564,7 @@ index f1910cf..fb4bf49 100644
 From 250fde71f653d72ac3e5f4528dd70492ae11e285 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Fri, 20 Feb 2009 14:05:20 -0500
-Subject: [PATCH 19/33] Add new api to ask when chooser widget is done loading items
+Subject: [PATCH 19/34] Add new api to ask when chooser widget is done loading items
 
 ---
  gui/simple-greeter/gdm-chooser-widget.c |    9 +++++++++
@@ -12620,7 +12620,7 @@ index 7e3e59c..6a07843 100644
 From cd41af42ac3bdb25d30b03be33efa20edb23b72d Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Fri, 20 Feb 2009 14:31:27 -0500
-Subject: [PATCH 20/33] Tell tasks they're ready only after user list loads
+Subject: [PATCH 20/34] Tell tasks they're ready only after user list loads
 
 This way they won't try to access the list prematurely.
 ---
@@ -12680,7 +12680,7 @@ index 8711992..e44122c 100644
 From 15dfb038516dcb27866371a1dcfd988137bd5072 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Fri, 6 Feb 2009 16:25:47 -0500
-Subject: [PATCH 21/33] Add fingerprint plugin
+Subject: [PATCH 21/34] Add fingerprint plugin
 
 This commit adds a plugin to initiate a conversation for
 fingerprint scans.
@@ -13325,7 +13325,7 @@ index 0000000..5ea9925
 From 8374d74f6c66da5f6b5afa4d504b5fccaeba41f7 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Wed, 11 Feb 2009 08:47:52 -0500
-Subject: [PATCH 22/33] Add start of a smartcard plugin
+Subject: [PATCH 22/34] Add start of a smartcard plugin
 
 It contains a copy and paste of an old RHEL patch
 I did a few years ago.
@@ -16594,7 +16594,7 @@ index 0000000..fffbd50
 From 4cfc355618cbc1d47650ad7483d06c3980cfcc46 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Mon, 23 Feb 2009 17:57:06 -0500
-Subject: [PATCH 23/33] Add a new "choosable" property to show tasks in user list
+Subject: [PATCH 23/34] Add a new "choosable" property to show tasks in user list
 
 Useful for Smartcard and some future "Guest" account plugin
 ---
@@ -16753,7 +16753,7 @@ index 632ee2d..ed19e62 100644
 From 11616eee76ac2e6c75c4b090f590696159eb3b92 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Tue, 24 Feb 2009 15:12:35 -0500
-Subject: [PATCH 24/33] Separate handling of non-users in user list from users
+Subject: [PATCH 24/34] Separate handling of non-users in user list from users
 
 Now get_chosen_user returns NULL if the activated item
 wasn't a user.  We also separate the handling of on item
@@ -16916,7 +16916,7 @@ index 7aa99e7..316ef46 100644
 From 7643db3623d28426893d7648ff65e3f030339c5d Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Fri, 27 Feb 2009 15:44:13 -0500
-Subject: [PATCH 25/33] Initiate smart card auth when clicking on it in list
+Subject: [PATCH 25/34] Initiate smart card auth when clicking on it in list
 
 ---
  gui/simple-greeter/gdm-greeter-login-window.c      |   24 ++++++++++++++++++++
@@ -16992,7 +16992,7 @@ index ed19e62..d3641ba 100644
 From 11d32d79e676ec4c46ad5bb1b51c2a8f17c519f0 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Mon, 2 Mar 2009 11:10:28 -0500
-Subject: [PATCH 26/33] Only show task list if user is selected
+Subject: [PATCH 26/34] Only show task list if user is selected
 
 ---
  gui/simple-greeter/gdm-greeter-login-window.c |   52 +++++++++++++++++--------
@@ -17190,7 +17190,7 @@ index 25831a6..162b784 100644
 From 3122b474ebd0325e2cd6e45748f3a67e3436a5a6 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Mon, 2 Mar 2009 13:53:34 -0500
-Subject: [PATCH 27/33] Pull verification functions out into their own subroutines
+Subject: [PATCH 27/34] Pull verification functions out into their own subroutines
 
 This makes the function smaller and easier to read
 ---
@@ -17362,7 +17362,7 @@ index 78e4644..ac3767a 100644
 From 23902b5f178ef6662850ae81a96f3c9aafc66317 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Mon, 2 Mar 2009 13:57:34 -0500
-Subject: [PATCH 28/33] Add new function find_task_with_service_name
+Subject: [PATCH 28/34] Add new function find_task_with_service_name
 
 It hides a bunch of icky foreach calls.
 ---
@@ -17486,7 +17486,7 @@ index ac3767a..fa93108 100644
 From adf32974d4fb816688498552727d664c80653064 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Mon, 2 Mar 2009 15:23:51 -0500
-Subject: [PATCH 29/33] Drop the different auth modes in favor of calling reset manually
+Subject: [PATCH 29/34] Drop the different auth modes in favor of calling reset manually
 
 ---
  gui/simple-greeter/gdm-greeter-login-window.c |   57 +++++++++++++++----------
@@ -17637,7 +17637,7 @@ index fa93108..ed009a4 100644
 From 996f22a0da8d207932f1efc1b30b337c485fa681 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Mon, 2 Mar 2009 17:09:16 -0500
-Subject: [PATCH 30/33] Notify plugins if their user choose requests fail
+Subject: [PATCH 30/34] Notify plugins if their user choose requests fail
 
 This allows the smart card plugin to cancel pending
 conversations when a card gets inserted.
@@ -17850,7 +17850,7 @@ index d3641ba..73e0f84 100644
 From c98a8ac6971b44071aef38a29b550378554a733b Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Mon, 13 Apr 2009 14:19:50 -0400
-Subject: [PATCH 31/33] reset all conversations if password conversation fails
+Subject: [PATCH 31/34] reset all conversations if password conversation fails
 
 This is a temporary hack until we store plugin policy in
 gconf.
@@ -17886,7 +17886,7 @@ index a16948f..3daf89d 100644
 From 339ca93db8f4896eaf02667c1268ddc9d1830345 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Tue, 21 Apr 2009 10:25:18 -0400
-Subject: [PATCH 32/33] When one PAM conversation wins, stop the others
+Subject: [PATCH 32/34] When one PAM conversation wins, stop the others
 
 This doesn't work yet, it's still in progress code.
 ---
@@ -18007,7 +18007,7 @@ index 09a7425..a70c9c9 100644
 From 80107a061b3ac2300e9cec17f18d5dc02557a8d3 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Tue, 21 Apr 2009 15:30:28 -0400
-Subject: [PATCH 33/33] When one PAM conv. wins, actually stop the others
+Subject: [PATCH 33/34] When one PAM conv. wins, actually stop the others
 
 We weren't properly keeping the winning conversation
 around in the previous commit
@@ -18046,6 +18046,71 @@ index cb84f01..7173080 100644
 -- 
 1.6.2.2
 
+From f69d85f7a2bc48f9d319835ab17a9fd13b6c7f23 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Wed, 13 May 2009 13:43:33 -0400
+Subject: [PATCH 34/34] Don't send auth-failed when worker dies
+
+Authentication hasn't failed, it just got aborted before it
+could.  This prevents a crash that happens when switching
+runlevels while the login screen is up.
+---
+ daemon/gdm-session-direct.c |   18 ++----------------
+ 1 files changed, 2 insertions(+), 16 deletions(-)
+
+diff --git a/daemon/gdm-session-direct.c b/daemon/gdm-session-direct.c
+index 7173080..9010dde 100644
+--- a/daemon/gdm-session-direct.c
++++ b/daemon/gdm-session-direct.c
+@@ -87,7 +87,6 @@ struct _GdmSessionDirectPrivate
+ 
+         GList               *pending_connections;
+ 
+-        guint32              is_authenticated : 1;
+         guint32              is_running : 1;
+         GPid                 session_pid;
+ 
+@@ -1771,13 +1770,7 @@ worker_exited (GdmSessionWorkerJob *job,
+         g_debug ("GdmSessionDirect: Worker job exited: %d", code);
+ 
+         g_object_ref (conversation->job);
+-        if (!conversation->session->priv->is_authenticated) {
+-                char *msg;
+-
+-                msg = g_strdup_printf (_("worker exited with status %d"), code);
+-                _gdm_session_authentication_failed (GDM_SESSION (conversation->session), conversation->service_name, msg);
+-                g_free (msg);
+-        } else if (conversation->session->priv->is_running) {
++        if (conversation->session->priv->is_running) {
+                 _gdm_session_session_exited (GDM_SESSION (conversation->session), code);
+         }
+ 
+@@ -1795,13 +1788,7 @@ worker_died (GdmSessionWorkerJob *job,
+         g_debug ("GdmSessionDirect: Worker job died: %d", signum);
+ 
+         g_object_ref (conversation->job);
+-        if (!conversation->session->priv->is_authenticated) {
+-                char *msg;
+-
+-                msg = g_strdup_printf (_("worker exited with status %d"), signum);
+-                _gdm_session_authentication_failed (GDM_SESSION (conversation->session), conversation->service_name, msg);
+-                g_free (msg);
+-        } else if (conversation->session->priv->is_running) {
++        if (conversation->session->priv->is_running) {
+                 _gdm_session_session_died (GDM_SESSION (conversation->session), signum);
+         }
+ 
+@@ -2413,7 +2400,6 @@ gdm_session_direct_close (GdmSession *session)
+ 
+         g_hash_table_remove_all (impl->priv->environment);
+ 
+-        impl->priv->is_authenticated = FALSE;
+         impl->priv->is_running = FALSE;
+ }
+ 
+-- 
+1.6.2.2
+
 diff --git a/daemon/gdm-session-worker-job.c b/daemon/gdm-session-worker-job.c
 index 0327d77..ad7cbac 100644
 --- a/daemon/gdm-session-worker-job.c
@@ -18057,5 +18122,4 @@ index 0327d77..ad7cbac 100644
 +                g_usleep (G_USEC_PER_SEC / 2);
 +                gdm_signal_pid (session_worker_job->priv->pid, SIGKILL);
                  session_worker_job_died (session_worker_job);
-         }
- 
+

@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.26.1
-Release: 9%{?dist}
+Release: 10%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -103,9 +103,6 @@ Patch20: session-client.patch
 # fixed upstream
 Patch21: xdmcp-use-after-free.patch
 
-# http://bugzilla.redhat.com/499272 43b1084d52892fffea7f2e6cd3731ad2a46b52bd
-Patch22: gdm-2.26.1-set-auth-flag.patch
-
 # Fedora-specific
 Patch99: gdm-2.23.1-fedora-logo.patch
 
@@ -151,7 +148,6 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 
 %patch20 -p1 -b .session-client
 %patch21 -p1 -b .xdmcp-use-after-free
-%patch22 -p1 -b .set-auth-flag
 
 %patch99 -p1 -b .fedora-logo
 
@@ -393,6 +389,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Wed May 13 2009 Ray Strode <rstrode@redhat.com> - 1:2.26.1-10
+- Update multi-stack patch to fix bug 499272
+
 * Fri May 08 2009 Ray Strode <rstrode@redhat.com> - 1:2.26.1-9
 - Redo patch from -8 since patch misapplies the other one.
 
