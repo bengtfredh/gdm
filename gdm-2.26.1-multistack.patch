@@ -3598,7 +3598,7 @@ index 4bb14f4..0f7e44e 100644
                                          GDM_SESSION_DBUS_ERROR_CANCEL,
                                          "Operation cancelled");
 -        conversation = session->priv->conversation;
-+        conversation = NULL;
++
          dbus_connection_send (conversation->worker_connection, reply, NULL);
          dbus_connection_flush (conversation->worker_connection);
  
