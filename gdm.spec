@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.26.1
-Release: 12%{?dist}
+Release: 13%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -393,6 +393,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Fri Jun 26 2009 Ray Strode <rstrode@redhat.com> - 1:2.26.1-13
+- Make xguest work (bug 505193)
+
 * Wed Jun 03 2009 Ray Strode <rstrode@redhat.com> - 1:2.26.1-12
 - Fix crasher spotted by Michael Young (bug 499489)
 
