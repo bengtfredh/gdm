@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -100,6 +100,7 @@ Patch4: gdm-2.28.0-use-devicekit-power.patch
 
 # uses /etc/sysconfig/keyboard and is thus not directly upstreamable
 # should probably be changed to get the system layout from the X server
+# https://bugzilla.gnome.org/show_bug.cgi?id=572765
 Patch13: gdm-system-keyboard.patch
 
 Patch19: gdm-multistack.patch
@@ -400,6 +401,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Thu Oct  1 2009 Matthias Clasen <mclasen@redhat.com> - 1:2.28.4-5
+- Handle keyboard layout variants
+
 * Mon Sep 28 2009 Ray Strode <rstrode@redhat.com> - 1:2.28.0-4
 - Add cache dir to package manifest
 
