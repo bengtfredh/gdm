@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -98,6 +98,8 @@ Patch3: gdm-2.23.92-save-root-window.patch
 # https://bugzilla.gnome.org/show_bug.cgi?id=596569
 Patch4: gdm-2.28.0-use-devicekit-power.patch
 
+Patch5: registryd-no-wrapper.patch
+
 # uses /etc/sysconfig/keyboard and is thus not directly upstreamable
 # should probably be changed to get the system layout from the X server
 # https://bugzilla.gnome.org/show_bug.cgi?id=572765
@@ -147,6 +149,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch2 -p1 -b .force-active-vt
 %patch3 -p1 -b .save-root-window
 %patch4 -p1 -b .use-devicekit-power
+%patch5 -p1 -b .registryd-no-wrapper
 %patch13 -p1 -b .system-keyboard
 
 %patch19 -p1 -b .multistack
@@ -401,6 +404,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Mon Oct  5 2009 Matthias Clasen <mclasen@redhat.com> - 1:2.28.4-6
+- Fix the autostart file for at-spi-registryd
+
 * Thu Oct  1 2009 Matthias Clasen <mclasen@redhat.com> - 1:2.28.4-5
 - Handle keyboard layout variants
 
