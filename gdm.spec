@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -404,6 +404,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Wed Oct 07 2009 Ray Strode <rstrode@redhat.com> - 1:2.28.0-7
+- Fix gdm-password / xguest interaction (bug 524421)
+
 * Mon Oct  5 2009 Matthias Clasen <mclasen@redhat.com> - 1:2.28.4-6
 - Fix the autostart file for at-spi-registryd
 
