@@ -15,8 +15,8 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 2.28.0
-Release: 9%{?dist}
+Version: 2.28.1
+Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -95,20 +95,12 @@ Requires: audit-libs >= %{libauditver}
 Patch2: gdm-2.26.0-force-active-vt.patch
 Patch3: gdm-2.23.92-save-root-window.patch
 
-# https://bugzilla.gnome.org/show_bug.cgi?id=596569
-Patch4: gdm-2.28.0-use-devicekit-power.patch
-
-# fixed upstream
-Patch5: registryd-no-wrapper.patch
-
 # uses /etc/sysconfig/keyboard and is thus not directly upstreamable
 # should probably be changed to get the system layout from the X server
 # https://bugzilla.gnome.org/show_bug.cgi?id=572765
 Patch13: gdm-system-keyboard.patch
 
 Patch19: gdm-multistack.patch
-Patch20: 0001-Fix-gdm_slave_get_timed_login_details.patch
-Patch21: fix-other-user.patch
 
 # Fedora-specific
 Patch98: gdm-bubble-location.patch
@@ -151,13 +143,9 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %setup -q
 %patch2 -p1 -b .force-active-vt
 %patch3 -p1 -b .save-root-window
-%patch4 -p1 -b .use-devicekit-power
-%patch5 -p1 -b .registryd-no-wrapper
 %patch13 -p1 -b .system-keyboard
 
 %patch19 -p1 -b .multistack
-%patch20 -p1 -b .autologin
-%patch21 -p1 -b .fix-other-user
 
 %patch98 -p1 -b .bubble-location
 %patch99 -p1 -b .fedora-logo
@@ -409,6 +397,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Tue Oct 20 2009 Ray Strode <rstrode@redhat.com> 2.28.1-1
+- Update to 2.28.1
+
 * Fri Oct 09 2009 Ray Strode <rstrode@redhat.com> 2.28.0-9
 - Fix Other... user.
 
