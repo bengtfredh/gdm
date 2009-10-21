@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -102,6 +102,7 @@ Patch13: gdm-system-keyboard.patch
 
 Patch19: gdm-multistack.patch
 Patch20: gdm-2.28.1-move-shutdown-functions.patch
+Patch21: fix-clock.patch
 
 # Fedora-specific
 Patch98: gdm-bubble-location.patch
@@ -148,6 +149,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 
 %patch19 -p1 -b .multistack
 %patch20 -p1 -b .move-shutdown-functions
+%patch21 -p1 -b .fix-clock
 
 %patch98 -p1 -b .bubble-location
 %patch99 -p1 -b .fedora-logo
@@ -399,6 +401,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Wed Oct 21 2009 Ray Strode <rstrode@redhat.com> 2.28.1-3
+- Move date from panel to clock tooltip
+
 * Tue Oct 20 2009 Ray Strode <rstrode@redhat.com> 2.28.1-2
 - Move shutdown functions to panel from login window
 
