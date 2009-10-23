@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -100,10 +100,12 @@ Patch3: gdm-2.23.92-save-root-window.patch
 # https://bugzilla.gnome.org/show_bug.cgi?id=572765
 Patch13: gdm-system-keyboard.patch
 
-Patch19: gdm-multistack.patch
 Patch20: gdm-2.28.1-move-shutdown-functions.patch
 Patch21: fix-clock.patch
+Patch22: fix-timer.patch
+Patch23: fix-na-tray.patch
 
+Patch97: gdm-multistack.patch
 # Fedora-specific
 Patch98: gdm-bubble-location.patch
 Patch99: gdm-2.23.1-fedora-logo.patch
@@ -147,10 +149,12 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch3 -p1 -b .save-root-window
 %patch13 -p1 -b .system-keyboard
 
-%patch19 -p1 -b .multistack
 %patch20 -p1 -b .move-shutdown-functions
 %patch21 -p1 -b .fix-clock
+%patch22 -p1 -b .fix-timer
+%patch23 -p1 -b .fix-na-tray
 
+%patch97 -p1 -b .multistack
 %patch98 -p1 -b .bubble-location
 %patch99 -p1 -b .fedora-logo
 
@@ -401,6 +405,12 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Thu Oct 22 2009 Ray Strode <rstrode@redhat.com> 2.28.1-4
+- Fix autologin window spasms
+- Fix autologin timer animation
+- Make autologin and multistack play better together
+- Add padding to notification tray
+
 * Wed Oct 21 2009 Ray Strode <rstrode@redhat.com> 2.28.1-3
 - Move date from panel to clock tooltip
 
