@@ -80,7 +80,7 @@ diff -Nur -x '*.orig' -x '*~' gdm-2.28.0/daemon/gdm-session-direct.c gdm-2.28.0.
 +                                                        NULL);
 +        }
 +
-+	if (variant) {
++	if (variant != NULL && variant[0] != '\0') {
 +	    result = g_strdup_printf("%s\t%s", layout, variant);
 +	    libhal_free_string (variant);
 +	} else {

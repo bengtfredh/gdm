@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -405,6 +405,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Fri Oct 23 2009 Ray Strode <rstrode@redhat.com> 2.28.1-6
+- Properly read default keyboard layout (bug 530452)
+
 * Fri Oct 23 2009 Ray Strode <rstrode@redhat.com> 2.28.1-5
 - Remove tool tip from login button
 
