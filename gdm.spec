@@ -405,6 +405,10 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Fri Oct 23 2009 Ray Strode <rstrode@redhat.com> 2.28.1-7
+- Show Other user even when there are no other users
+  (bug 527920)
+
 * Fri Oct 23 2009 Ray Strode <rstrode@redhat.com> 2.28.1-6
 - Properly read default keyboard layout (bug 530452)
 
