@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -405,6 +405,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Fri Oct 23 2009 Ray Strode <rstrode@redhat.com> 2.28.1-5
+- Remove tool tip from login button
+
 * Thu Oct 22 2009 Ray Strode <rstrode@redhat.com> 2.28.1-4
 - Fix autologin window spasms
 - Fix autologin timer animation
