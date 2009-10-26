@@ -1285,3 +1285,42 @@ index d5dd820..016f636 100644
 -- 
 1.6.5.rc2
 
+From 7fbb5c0dec8aa42b1d8985c6f62be02c035175da Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Mon, 26 Oct 2009 15:00:43 -0400
+Subject: [PATCH] Position shutdown menu better in multi-monitor displays
+
+---
+ gui/simple-greeter/gdm-greeter-panel.c |   13 ++++++++++++-
+ 1 files changed, 12 insertions(+), 1 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-greeter-panel.c b/gui/simple-greeter/gdm-greeter-panel.c
+index 43b91d5..caade7a 100644
+--- a/gui/simple-greeter/gdm-greeter-panel.c
++++ b/gui/simple-greeter/gdm-greeter-panel.c
+@@ -790,10 +790,21 @@ position_shutdown_menu (GtkMenu         *menu,
+                         GdmGreeterPanel *panel)
+ {
+         GtkRequisition menu_requisition;
++        GdkScreen *screen;
++        int monitor;
+ 
+         *push_in = TRUE;
+ 
+-        *x = panel->priv->shutdown_button->allocation.x;
++        screen = gtk_widget_get_screen (GTK_WIDGET (panel));
++        monitor = gdk_screen_get_monitor_at_window (screen, GTK_WIDGET (panel)->window);
++        gtk_menu_set_monitor (menu, monitor);
++
++        gtk_widget_translate_coordinates (GTK_WIDGET (panel->priv->shutdown_button),
++                                          GTK_WIDGET (panel),
++                                          panel->priv->shutdown_button->allocation.x,
++                                          panel->priv->shutdown_button->allocation.y,
++                                          x, y);
++
+         gtk_window_get_position (GTK_WINDOW (panel), NULL, y);
+ 
+         gtk_widget_size_request (GTK_WIDGET (menu), &menu_requisition);
+-- 
+1.6.5.1
+
