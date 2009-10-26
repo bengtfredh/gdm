@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 6%{?dist}
+Release: 10%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -104,6 +104,7 @@ Patch20: gdm-2.28.1-move-shutdown-functions.patch
 Patch21: fix-clock.patch
 Patch22: fix-timer.patch
 Patch23: fix-na-tray.patch
+Patch24: fix-computer-info.patch
 
 Patch97: gdm-multistack.patch
 # Fedora-specific
@@ -153,6 +154,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch21 -p1 -b .fix-clock
 %patch22 -p1 -b .fix-timer
 %patch23 -p1 -b .fix-na-tray
+%patch24 -p1 -b .fix-computer-info
 
 %patch97 -p1 -b .multistack
 %patch98 -p1 -b .bubble-location
@@ -405,8 +407,22 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
-* Mon Oct 26 2009 Ray Strode <rstrode@redhat.com> 2.28.1-6
+* Mon Oct 26 2009 Ray Strode <rstrode@redhat.com> 2.28.1-10
 - Position shutdown menu properly on multihead machines
+
+* Fri Oct 23 2009 Ray Strode <rstrode@redhat.com> 2.28.1-9
+- Don't show hostname by default if it's localhost
+
+* Fri Oct 23 2009 Ray Strode <rstrode@redhat.com> 2.28.1-8
+- Attempt to fix crash some users see.
+- Clean up rebase
+
+* Fri Oct 23 2009 Ray Strode <rstrode@redhat.com> 2.28.1-7
+- Show Other user even when there are no other users
+  (bug 527920)
+
+* Fri Oct 23 2009 Ray Strode <rstrode@redhat.com> 2.28.1-6
+- Properly read default keyboard layout (bug 530452)
 
 * Fri Oct 23 2009 Ray Strode <rstrode@redhat.com> 2.28.1-5
 - Remove tool tip from login button
