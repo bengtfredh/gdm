@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 11%{?dist}
+Release: 12%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -413,6 +413,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Tue Oct 27 2009 Ray Strode <rstrode@redhat.com> 2.28.1-12
+- One more go at bug 527920
+
 * Tue Oct 27 2009 Ray Strode <rstrode@redhat.com> 2.28.1-11
 - Tighten permissions on /var/run/gdm (bug 531063)
 
