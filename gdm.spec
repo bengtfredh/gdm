@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 10%{?dist}
+Release: 11%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -105,6 +105,7 @@ Patch21: fix-clock.patch
 Patch22: fix-timer.patch
 Patch23: fix-na-tray.patch
 Patch24: fix-computer-info.patch
+Patch25: fix-run-dir-permissions.patch
 
 Patch97: gdm-multistack.patch
 # Fedora-specific
@@ -155,6 +156,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch22 -p1 -b .fix-timer
 %patch23 -p1 -b .fix-na-tray
 %patch24 -p1 -b .fix-computer-info
+%patch25 -p1 -b .fix-run-dir-permission
 
 %patch97 -p1 -b .multistack
 %patch98 -p1 -b .bubble-location
@@ -225,6 +227,8 @@ mkdir -p $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow
 
 # temporarily manually copy this
 cp -f %{SOURCE10} $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/polkit-gnome-authentication-agent-1.desktop
+
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/gdm/greeter
 
 rm -rf $RPM_BUILD_ROOT%{_localstatedir}/scrollkeeper
 
@@ -379,10 +383,12 @@ fi
 %config %{_datadir}/gdm/autostart/LoginWindow/*
 %dir %{_localstatedir}/log/gdm
 %dir %{_localstatedir}/spool/gdm
+%dir %{_localstatedir}/run/gdm/greeter
 %attr(1770, gdm, gdm) %dir %{_localstatedir}/lib/gdm
 %attr(1750, gdm, gdm) %dir %{_localstatedir}/lib/gdm/.gconf.mandatory
 %attr(1640, gdm, gdm) %dir %{_localstatedir}/lib/gdm/.gconf.mandatory/*.xml
 %attr(1640, gdm, gdm) %dir %{_localstatedir}/lib/gdm/.gconf.path
+%attr(1755, gdm, gdm) %dir %{_localstatedir}/run/gdm/greeter
 %attr(1770, root, gdm) %dir %{_localstatedir}/gdm
 %attr(1777, root, gdm) %dir %{_localstatedir}/run/gdm
 %attr(1755, root, gdm) %dir %{_localstatedir}/cache/gdm
@@ -407,6 +413,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Tue Oct 27 2009 Ray Strode <rstrode@redhat.com> 2.28.1-11
+- Tighten permissions on /var/run/gdm (bug 531063)
+
 * Mon Oct 26 2009 Ray Strode <rstrode@redhat.com> 2.28.1-10
 - Position shutdown menu properly on multihead machines
 
