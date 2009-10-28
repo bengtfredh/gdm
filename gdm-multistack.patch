@@ -18104,3 +18104,35 @@ index 8af5452..585d7bc 100644
 -- 
 1.6.5.1
 
+From cbfac7d59da91ae6eaad568fe512bfa44bf01107 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Wed, 28 Oct 2009 13:57:53 -0400
+Subject: [PATCH] Don't show unimportant images on plugin buttons
+
+---
+ gui/simple-greeter/gdm-greeter-login-window.c |    8 +++++++-
+ 1 files changed, 7 insertions(+), 1 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-greeter-login-window.c b/gui/simple-greeter/gdm-greeter-login-window.c
+index 585d7bc..dd763ff 100644
+--- a/gui/simple-greeter/gdm-greeter-login-window.c
++++ b/gui/simple-greeter/gdm-greeter-login-window.c
+@@ -1997,8 +1997,14 @@ on_button_action_icon_name_changed (GtkWidget *button)
+ 
+         action = gtk_widget_get_action (button);
+ 
+-        image = gtk_action_create_icon (GTK_ACTION (action), GTK_ICON_SIZE_BUTTON);
++        if (gtk_action_get_is_important (action)) {
++                image = gtk_action_create_icon (GTK_ACTION (action), GTK_ICON_SIZE_BUTTON);
++        } else {
++                image = NULL;
++        }
++
+         gtk_button_set_image (GTK_BUTTON (button), image);
++
+ }
+ 
+ static void
+-- 
+1.6.5.1
+
