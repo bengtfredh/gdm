@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 12%{?dist}
+Release: 13%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -413,6 +413,10 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Wed Oct 28 2009 Ray Strode <rstrode@redhat.com> 2.28.1-13
+- Fix double free during user switching (might address
+  bug 512944)
+
 * Tue Oct 27 2009 Ray Strode <rstrode@redhat.com> 2.28.1-12
 - One more go at bug 527920
 
