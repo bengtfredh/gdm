@@ -22,7 +22,7 @@ index 7918b48..9453d7e 100644
 -                } else {
 -                        *width = renderer->priv->value <= G_MINDOUBLE?  0 : 64;
 -                }
-+                *width = cell->xpad * 2 + 42;
++                *width = cell->xpad * 2 + 24;
          }
  
          if (height != NULL) {
@@ -31,7 +31,7 @@ index 7918b48..9453d7e 100644
 -                } else {
 -                        *height = renderer->priv->value <= G_MINDOUBLE?  0 : 64;
 -                }
-+                *height = cell->ypad * 2 + 42;
++                *height = cell->ypad * 2 + 24;
          }
  }
  

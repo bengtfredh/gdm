@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 15%{?dist}
+Release: 16%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -413,6 +413,10 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Thu Oct 29 2009 Ray Strode <rstrode@redhat.com> 2.28.1-16
+- Shrink autologin timer
+- Make language dialog not double spaced
+
 * Thu Oct 29 2009 Ray Strode <rstrode@redhat.com> 2.28.1-15
 - Don't show fingerprint task button unless fingerprint is
   enabled
