@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.26.1
-Release: 13%{?dist}
+Release: 14%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -106,6 +106,9 @@ Patch21: xdmcp-use-after-free.patch
 # fixed upstream, rh 502778
 Patch22: gdm-2.26.0-fix-lang-regex.patch
 
+# http://bugzilla.redhat.com/512944
+Patch23: fix-double-free.patch
+
 # Fedora-specific
 Patch99: gdm-2.23.1-fedora-logo.patch
 
@@ -152,6 +155,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch20 -p1 -b .session-client
 %patch21 -p1 -b .xdmcp-use-after-free
 %patch22 -p1 -b .fix-lang-regex
+%patch23 -p1 -b .fix-double-free
 
 %patch99 -p1 -b .fedora-logo
 
@@ -393,6 +397,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Fri Oct 30 2009 Ray Strode <rstrode@redhat.com> 2.26.1-14
+- Fix double free (bug 512944)
+
 * Fri Jun 26 2009 Ray Strode <rstrode@redhat.com> - 1:2.26.1-13
 - Make xguest work (bug 505193)
 

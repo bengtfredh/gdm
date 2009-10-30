@@ -1,0 +1,30 @@
+commit a1835572951be24cdaa15496708d502ef90e29ff
+Author: Ray Strode <rstrode@redhat.com>
+Date:   Wed Oct 28 11:13:10 2009 -0400
+
+    Prevent start session signal handler from getting called multiple times
+    
+    It was causing a double free.
+
+diff --git a/gui/simple-greeter/gdm-greeter-login-window.c b/gui/simple-greeter/gdm-greeter-login-window.c
+index 4991cb1..4e147ea 100644
+--- a/gui/simple-greeter/gdm-greeter-login-window.c
++++ b/gui/simple-greeter/gdm-greeter-login-window.c
+@@ -908,8 +908,17 @@ on_ready_to_start_session (GdmGreeterLoginWindow *login_window,
+                            GParamSpec            *param_spec,
+                            char                  *service_name)
+ {
++        if (!login_window->priv->is_interactive) {
++                return;
++        }
++
+         gdm_greeter_login_window_start_session_when_ready (login_window, service_name);
+         g_free (service_name);
++
++        if (login_window->priv->start_session_handler_id > 0) {
++                g_signal_handler_disconnect (login_window, login_window->priv->start_session_handler_id);
++                login_window->priv->start_session_handler_id = 0;
++        }
+ }
+ 
+ static void
