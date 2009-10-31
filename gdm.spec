@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 18%{?dist}
+Release: 19%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -107,6 +107,7 @@ Patch23: fix-na-tray.patch
 Patch24: fix-computer-info.patch
 Patch25: fix-run-dir-permissions.patch
 Patch26: make-user-list-animation-smoother.patch
+Patch27: 0001-Don-t-show-lock-screen-option-if-locked-down.patch
 
 Patch96: gdm-multistack.patch
 # Fedora-specific
@@ -160,6 +161,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch24 -p1 -b .fix-computer-info
 %patch25 -p1 -b .fix-run-dir-permission
 %patch26 -p1 -b .make-user-list-animation-smoother
+%patch27 -p1 -b .dont-show-lock-screen-if-locked-down
 
 %patch96 -p1 -b .multistack
 %patch97 -p1 -b .bubble-location
@@ -417,6 +419,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Sat Oct 31 2009 Matthias Clasen <mclasen@redhat.com> 2.28.1-19
+- Don't show 'Lock Screen' in the user switcher if locked down
+
 * Sat Oct 31 2009 Matthias Clasen <mclasen@redhat.com> 2.28.1-18
 - Actually set up statusicon padding
 
