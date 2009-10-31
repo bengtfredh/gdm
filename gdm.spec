@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 17%{?dist}
+Release: 18%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -108,9 +108,10 @@ Patch24: fix-computer-info.patch
 Patch25: fix-run-dir-permissions.patch
 Patch26: make-user-list-animation-smoother.patch
 
-Patch97: gdm-multistack.patch
+Patch96: gdm-multistack.patch
 # Fedora-specific
-Patch98: gdm-bubble-location.patch
+Patch97: gdm-bubble-location.patch
+Patch98: tray-padding.patch
 Patch99: gdm-2.23.1-fedora-logo.patch
 
 %package user-switch-applet
@@ -160,8 +161,9 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch25 -p1 -b .fix-run-dir-permission
 %patch26 -p1 -b .make-user-list-animation-smoother
 
-%patch97 -p1 -b .multistack
-%patch98 -p1 -b .bubble-location
+%patch96 -p1 -b .multistack
+%patch97 -p1 -b .bubble-location
+%patch98 -p1 -b .tray-padding
 %patch99 -p1 -b .fedora-logo
 
 autoreconf -i -f
@@ -415,6 +417,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Sat Oct 31 2009 Matthias Clasen <mclasen@redhat.com> 2.28.1-18
+- Actually set up statusicon padding
+
 * Fri Oct 30 2009 Ray Strode <rstrode@redhat.com> 2.28.1-17
 - Make the user list slide animation smoother
 
