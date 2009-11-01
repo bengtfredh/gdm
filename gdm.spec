@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 19%{?dist}
+Release: 20%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -419,7 +419,7 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
-* Sat Oct 31 2009 Matthias Clasen <mclasen@redhat.com> 2.28.1-19
+* Sat Oct 31 2009 Matthias Clasen <mclasen@redhat.com> 2.28.1-20
 - Don't show 'Lock Screen' in the user switcher if locked down
 
 * Sat Oct 31 2009 Matthias Clasen <mclasen@redhat.com> 2.28.1-18
