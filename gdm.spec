@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 21%{?dist}
+Release: 22%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -108,6 +108,7 @@ Patch24: fix-computer-info.patch
 Patch25: fix-run-dir-permissions.patch
 Patch26: make-user-list-animation-smoother.patch
 Patch27: 0001-Don-t-show-lock-screen-option-if-locked-down.patch
+Patch28: hide-search-entry.patch
 
 Patch96: gdm-multistack.patch
 Patch100: gdm-2.28.1-eviction-notice.patch
@@ -163,6 +164,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch25 -p1 -b .fix-run-dir-permission
 %patch26 -p1 -b .make-user-list-animation-smoother
 %patch27 -p1 -b .dont-show-lock-screen-if-locked-down
+%patch28 -p1 -b .hide-search-entry
 
 %patch96 -p1 -b .multistack
 %patch100 -p1 -b .eviction-notice
@@ -421,6 +423,10 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Tue Nov 03 2009 Ray Strode <rstrode@redhat.com> 2.28.1-22
+- Hide search entry.  It's too easy to show others your
+  password.
+
 * Tue Nov 03 2009 Ray Strode <rstrode@redhat.com> 2.28.1-21
 - Evict Log In button from its house
 

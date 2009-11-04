@@ -1,0 +1,34 @@
+diff --git a/gui/simple-greeter/gdm-chooser-widget.c b/gui/simple-greeter/gdm-chooser-widget.c
+index ee5eeb0..9206fcc 100644
+--- a/gui/simple-greeter/gdm-chooser-widget.c
++++ b/gui/simple-greeter/gdm-chooser-widget.c
+@@ -1770,6 +1770,17 @@ search_equal_func (GtkTreeModel     *model,
+ }
+ 
+ static void
++search_position_func (GtkTreeView *tree_view,
++                      GtkWidget   *search_dialog,
++                      gpointer     user_data)
++{
++        /* Move it offscreen.
++         * FIXME: This is pretty inelegant.
++         */
++        gtk_window_move (GTK_WINDOW (search_dialog), -24000, -24000);
++}
++
++static void
+ on_selection_changed (GtkTreeSelection *selection,
+                       GdmChooserWidget *widget)
+ {
+@@ -1826,6 +1837,11 @@ gdm_chooser_widget_init (GdmChooserWidget *widget)
+                                              widget,
+                                              NULL);
+ 
++        gtk_tree_view_set_search_position_func (GTK_TREE_VIEW (widget->priv->items_view),
++                                                (GtkTreeViewSearchPositionFunc)search_position_func,
++                                                widget,
++                                                NULL);
++
+         /* hack to make single-click activate work
+          */
+         g_signal_connect_after (widget->priv->items_view,
