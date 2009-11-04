@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 20%{?dist}
+Release: 21%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -110,6 +110,7 @@ Patch26: make-user-list-animation-smoother.patch
 Patch27: 0001-Don-t-show-lock-screen-option-if-locked-down.patch
 
 Patch96: gdm-multistack.patch
+Patch100: gdm-2.28.1-eviction-notice.patch
 # Fedora-specific
 Patch97: gdm-bubble-location.patch
 Patch98: tray-padding.patch
@@ -164,6 +165,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch27 -p1 -b .dont-show-lock-screen-if-locked-down
 
 %patch96 -p1 -b .multistack
+%patch100 -p1 -b .eviction-notice
 %patch97 -p1 -b .bubble-location
 %patch98 -p1 -b .tray-padding
 %patch99 -p1 -b .fedora-logo
@@ -419,6 +421,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Tue Nov 03 2009 Ray Strode <rstrode@redhat.com> 2.28.1-21
+- Evict Log In button from its house
+
 * Sat Oct 31 2009 Matthias Clasen <mclasen@redhat.com> 2.28.1-20
 - Don't show 'Lock Screen' in the user switcher if locked down
 
