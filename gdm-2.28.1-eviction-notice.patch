@@ -20,3 +20,14 @@ diff -up gdm-2.28.1/gui/simple-greeter/plugins/smartcard/gdm-smartcard-extension
          gtk_action_group_add_action (extension->priv->actions,
                                       action);
  
+diff -up gdm-2.28.0/gui/simple-greeter/gdm-greeter-login-window.glade.eviction-notice gdm-2.28.0/gui/simple-greeter/gdm-greeter-login-window.glade
+--- gdm-2.28.0/gui/simple-greeter/gdm-greeter-login-window.glade.eviction-notice	2009-11-05 12:46:06.072238114 -0500
++++ gdm-2.28.0/gui/simple-greeter/gdm-greeter-login-window.glade	2009-11-05 12:46:14.695237567 -0500
+@@ -559,7 +559,6 @@
+ 			  <child>
+ 			    <widget class="GtkImage" id="image1">
+ 			      <property name="visible">True</property>
+-			      <property name="icon_name">go-home</property>
+ 			      <property name="pixel_size">16</property>
+ 			      <property name="xalign">0.5</property>
+ 			      <property name="yalign">0.5</property>

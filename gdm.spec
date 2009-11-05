@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 22%{?dist}
+Release: 23%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -423,6 +423,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Tue Nov 03 2009 Ray Strode <rstrode@redhat.com> 2.28.1-23
+- Evict Automatic Log In button from its house
+
 * Tue Nov 03 2009 Ray Strode <rstrode@redhat.com> 2.28.1-22
 - Hide search entry.  It's too easy to show others your
   password.
