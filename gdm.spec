@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.1
-Release: 24%{?dist}
+Release: 25%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -109,6 +109,8 @@ Patch25: fix-run-dir-permissions.patch
 Patch26: make-user-list-animation-smoother.patch
 Patch27: 0001-Don-t-show-lock-screen-option-if-locked-down.patch
 Patch28: hide-search-entry.patch
+# http://bugzilla.redhat.com/539737
+Patch29: dont-crash-with-invalid-utf8.patch
 
 Patch96: gdm-multistack.patch
 Patch100: gdm-2.28.1-eviction-notice.patch
@@ -165,6 +167,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch26 -p1 -b .make-user-list-animation-smoother
 %patch27 -p1 -b .dont-show-lock-screen-if-locked-down
 %patch28 -p1 -b .hide-search-entry
+%patch29 -p1 -b .dont-crash-with-invalid-utf8
 
 %patch96 -p1 -b .multistack
 %patch100 -p1 -b .eviction-notice
@@ -423,6 +426,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Tue Dec 01 2009 Ray Strode <rstrode@redhat.com> 2.28.1-25
+- Don't crash if /etc/passwd contains invalid utf8 (bug 539737)
+
 * Fri Nov 06 2009 Ray Strode <rstrode@redhat.com> 2.28.1-24
 - Fix login button after cancel on livecd
 
