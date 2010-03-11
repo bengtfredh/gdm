@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -112,6 +112,7 @@ Patch28: hide-search-entry.patch
 
 Patch96: gdm-multistack.patch
 Patch100: gdm-2.28.1-eviction-notice.patch
+Patch101: 0001-Fix-bug-603756-ensure-runtime-dir-is-always-set.patch
 # Fedora-specific
 Patch97: gdm-bubble-location.patch
 Patch98: tray-padding.patch
@@ -168,6 +169,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 
 %patch96 -p1 -b .multistack
 %patch100 -p1 -b .eviction-notice
+%patch101 -p1 -b .runtime-dir
 %patch97 -p1 -b .bubble-location
 %patch98 -p1 -b .tray-padding
 %patch99 -p1 -b .fedora-logo
@@ -423,6 +425,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Wed Mar 10 2010 Jesse Keating <jkeating@redhat.com> - 2.28.2-2
+- Fix bug #603756, ensure runtime dir is always set. (RH 562356)
+
 * Wed Dec 16 2009 Matthias Clasen <mclasen@redhat.com> - 2.28.2-1
 - Update to 2.28.2
 - See http://download.gnome.org/sources/gdm/2.28/gdm-2.28.2.news
