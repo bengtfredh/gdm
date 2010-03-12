@@ -1,0 +1,124 @@
+From a30038e45158d37f380e680040a225c9d524c874 Mon Sep 17 00:00:00 2001
+From: Brian Cameron <Brian.Cameron@sun.com>
+Date: Wed, 13 Jan 2010 12:21:58 -0500
+Subject: [PATCH 1/2] Run PostLogin script as normal user
+
+1) In daemon/gdm-slave.c it now sets PATH to GDM_SESSION_DEFAULT_PATH so that
+   the scripts have the system normal PATH when run.
+
+   This is much better than hardcoding the PATH in the scripts themselves,
+   especially since the Init, PreSession, PostSession, and PostLogin scripts
+   are designed to run per-display and it makes things just complicated if
+   users need to add the common system path to any per-display script they
+   might want to use.
+
+2) The Init and PreSession scripts are fixed to set the PATH to "@X_PATH:$PATH"
+   and not add "/bin:/usr/bin" since this isn't neeed since PATH is already
+   set to GDM_SESSION_DEFAULT_PATH before running the script.
+
+See https://bugzilla.gnome.org/show_bug.cgi?id=602403
+---
+ daemon/gdm-simple-slave.c |    5 ++++-
+ daemon/gdm-slave.c        |    4 +---
+ data/Init.in              |    2 +-
+ data/PreSession.in        |    2 +-
+ 4 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/daemon/gdm-simple-slave.c b/daemon/gdm-simple-slave.c
+index 948886f..c95a954 100644
+--- a/daemon/gdm-simple-slave.c
++++ b/daemon/gdm-simple-slave.c
+@@ -334,6 +334,8 @@ try_migrate_session (GdmSimpleSlave *slave)
+ static void
+ stop_greeter (GdmSimpleSlave *slave)
+ {
++        char *username;
++
+         g_debug ("GdmSimpleSlave: Stopping greeter");
+ 
+         if (slave->priv->greeter == NULL) {
+@@ -342,7 +344,8 @@ stop_greeter (GdmSimpleSlave *slave)
+         }
+ 
+         /* Run the PostLogin script. gdmslave suspends until script has terminated */
+-        gdm_slave_run_script (GDM_SLAVE (slave), GDMCONFDIR "/PostLogin", GDM_USERNAME);
++        username = gdm_session_direct_get_username (slave->priv->session);
++        gdm_slave_run_script (GDM_SLAVE (slave), GDMCONFDIR "/PostLogin", username);
+ 
+         gdm_welcome_session_stop (GDM_WELCOME_SESSION (slave->priv->greeter));
+         gdm_greeter_server_stop (slave->priv->greeter_server);
+diff --git a/daemon/gdm-slave.c b/daemon/gdm-slave.c
+index 477b42d..14f736d 100644
+--- a/daemon/gdm-slave.c
++++ b/daemon/gdm-slave.c
+@@ -225,9 +225,7 @@ get_script_environment (GdmSlave   *slave,
+         /* Runs as root */
+         g_hash_table_insert (hash, g_strdup ("XAUTHORITY"), g_strdup (slave->priv->display_x11_authority_file));
+         g_hash_table_insert (hash, g_strdup ("DISPLAY"), g_strdup (slave->priv->display_name));
+-
+-        /*g_setenv ("PATH", gdm_daemon_config_get_value_string (GDM_KEY_ROOT_PATH), TRUE);*/
+-
++        g_hash_table_insert (hash, g_strdup ("PATH"), g_strdup (GDM_SESSION_DEFAULT_PATH));
+         g_hash_table_insert (hash, g_strdup ("RUNNING_UNDER_GDM"), g_strdup ("true"));
+ 
+         g_hash_table_remove (hash, "MAIL");
+diff --git a/data/Init.in b/data/Init.in
+index 091f535..dca63a2 100644
+--- a/data/Init.in
++++ b/data/Init.in
+@@ -3,7 +3,7 @@
+ # Plus a lot of fun stuff added
+ #  -George
+ 
+-PATH=@X_PATH@:$PATH
++PATH="@X_PATH@:$PATH"
+ OLD_IFS=$IFS
+ 
+ gdmwhich () {
+diff --git a/data/PreSession.in b/data/PreSession.in
+index 6f31d3d..cfabee7 100755
+--- a/data/PreSession.in
++++ b/data/PreSession.in
+@@ -6,4 +6,4 @@
+ #
+ # Note that output goes into the .xsession-errors file for easy debugging
+ #
+-PATH="@X_PATH@:$PATH:/bin:/usr/bin"
++PATH="@X_PATH@:$PATH"
+-- 
+1.7.0.1
+
+
+From 1a838fea4af862fe27b68ea36f6251d2527c00d0 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Wed, 13 Jan 2010 12:28:10 -0500
+Subject: [PATCH 2/2] Only run PostLogin script post login
+
+We don't want to run it when stopping the greeter for other reasons.
+
+Spotted by Halton.
+
+See https://bugzilla.gnome.org/show_bug.cgi?id=602403#c6
+---
+ daemon/gdm-simple-slave.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
+
+diff --git a/daemon/gdm-simple-slave.c b/daemon/gdm-simple-slave.c
+index c95a954..8bdefa9 100644
+--- a/daemon/gdm-simple-slave.c
++++ b/daemon/gdm-simple-slave.c
+@@ -345,7 +345,10 @@ stop_greeter (GdmSimpleSlave *slave)
+ 
+         /* Run the PostLogin script. gdmslave suspends until script has terminated */
+         username = gdm_session_direct_get_username (slave->priv->session);
+-        gdm_slave_run_script (GDM_SLAVE (slave), GDMCONFDIR "/PostLogin", username);
++
++        if (username != NULL) {
++                gdm_slave_run_script (GDM_SLAVE (slave), GDMCONFDIR "/PostLogin", username);
++        }
+ 
+         gdm_welcome_session_stop (GDM_WELCOME_SESSION (slave->priv->greeter));
+         gdm_greeter_server_stop (slave->priv->greeter_server);
+-- 
+1.7.0.1
+

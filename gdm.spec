@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.28.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -109,6 +109,7 @@ Patch25: fix-run-dir-permissions.patch
 Patch26: make-user-list-animation-smoother.patch
 Patch27: 0001-Don-t-show-lock-screen-option-if-locked-down.patch
 Patch28: hide-search-entry.patch
+Patch29: fix-post-login-script-execution.patch
 
 Patch96: gdm-multistack.patch
 Patch100: gdm-2.28.1-eviction-notice.patch
@@ -166,6 +167,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch26 -p1 -b .make-user-list-animation-smoother
 %patch27 -p1 -b .dont-show-lock-screen-if-locked-down
 %patch28 -p1 -b .hide-search-entry
+%patch29 -p1 -b .fix-post-login
 
 %patch96 -p1 -b .multistack
 %patch100 -p1 -b .eviction-notice
@@ -425,6 +427,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Fri Mar 12 2010 Ray Strode <rstrode@redhat.com> 2.28.2-3
+- bug 449675 - set LOGNAME to correct user when running PostLogin
+
 * Wed Mar 10 2010 Jesse Keating <jkeating@redhat.com> - 2.28.2-2
 - Fix bug #603756, ensure runtime dir is always set. (RH 562356)
 
