@@ -16,7 +16,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.26.1
-Release: 14%{?dist}
+Release: 15%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -109,6 +109,9 @@ Patch22: gdm-2.26.0-fix-lang-regex.patch
 # http://bugzilla.redhat.com/512944
 Patch23: fix-double-free.patch
 
+# http://bugzilla.redhat.com/449675
+Patch24: fix-post-login-script-execution.patch
+
 # Fedora-specific
 Patch99: gdm-2.23.1-fedora-logo.patch
 
@@ -156,6 +159,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %patch21 -p1 -b .xdmcp-use-after-free
 %patch22 -p1 -b .fix-lang-regex
 %patch23 -p1 -b .fix-double-free
+%patch24 -p1 -b .fix-post-login-script-execution
 
 %patch99 -p1 -b .fedora-logo
 
@@ -397,6 +401,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Fri Mar 12 2010 Ray Strode <rstrode@redhat.com> 2.26.1-15
+- set LOGNAME correctly when running PostLogin script
+
 * Fri Oct 30 2009 Ray Strode <rstrode@redhat.com> 2.26.1-14
 - Fix double free (bug 512944)
 
