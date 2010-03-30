@@ -55,6 +55,8 @@ Requires: plymouth-gdm-hooks
 Requires: pulseaudio-gdm-hooks
 # We need 1.0.4-5 since it lets us use "localhost" in auth cookies
 Requires: libXau >= 1.0.4-4
+Requires(post): scrollkeeper
+Requires(postun): scrollkeeper
 BuildRequires: pkgconfig(libcanberra-gtk)
 BuildRequires: scrollkeeper >= 0:%{scrollkeeper_version}
 BuildRequires: pango-devel >= 0:%{pango_version}
@@ -91,12 +93,14 @@ Provides: service(graphical-login) = %{name}
 Requires: audit-libs >= %{libauditver}
 Patch2: plymouth.patch
 
+# https://bugzilla.gnome.org/show_bug.cgi?id=610179
+Patch3: accounts-service.patch
+
 Patch96: gdm-multistack.patch
 # Fedora-specific
 Patch97: gdm-bubble-location.patch
 Patch98: tray-padding.patch
 Patch99: gdm-2.23.1-fedora-logo.patch
-Patch100: fix-boot.patch
 
 Patch101: gdm-libs.patch
 
@@ -136,11 +140,11 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %prep
 %setup -q
 %patch2 -p1 -b .plymouth
+%patch3 -p1 -b .accounts-service
 %patch96 -p1 -b .multistack
 %patch97 -p1 -b .bubble-location
 %patch98 -p1 -b .tray-padding
 %patch99 -p1 -b .fedora-logo
-%patch100 -p1 -b .fix-boot
 %patch101 -p1 -b .libs
 
 autoreconf -i -f
@@ -157,11 +161,11 @@ cp -f %{SOURCE8} gui/simple-greeter/plugins/fingerprint/icons/16x16/gdm-fingerpr
 cp -f %{SOURCE9} gui/simple-greeter/plugins/fingerprint/icons/48x48/gdm-fingerprint.png
 
 %configure --with-pam-prefix=%{_sysconfdir} \
-           --enable-profiling      \
-           --enable-console-helper \
-           --disable-scrollkeeper  \
-           --with-console-kit      \
-           --with-selinux
+	   --enable-profiling      \
+	   --enable-console-helper \
+	   --disable-scrollkeeper  \
+	   --with-console-kit      \
+	   --with-selinux
 
 # drop unneeded direct library deps with --as-needed
 # libtool doesn't make this easy, so we do it the hard way
@@ -241,8 +245,12 @@ exit 0
 
 %post
 /sbin/ldconfig
+scrollkeeper-update
 
-touch --no-create /usr/share/icons/hicolor >&/dev/null || :
+touch --no-create /usr/share/icons/hicolor
+if [ -x /usr/bin/gtk-update-icon-cache ]; then
+  gtk-update-icon-cache -q /usr/share/icons/hicolor
+fi
 
 export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
 gconftool-2 --makefile-install-rule %{_sysconfdir}/gconf/schemas/gdm-simple-greeter.schemas >/dev/null
@@ -254,9 +262,9 @@ custom=/etc/gdm/custom.conf
 
 if [ $1 -ge 2 ] ; then
     if [ -f /usr/share/gdm/config/gdm.conf-custom ]; then
-        oldconffile=/usr/share/gdm/config/gdm.conf-custom
+	oldconffile=/usr/share/gdm/config/gdm.conf-custom
     elif [ -f /etc/X11/gdm/gdm.conf ]; then
-        oldconffile=/etc/X11/gdm/gdm.conf
+	oldconffile=/etc/X11/gdm/gdm.conf
     fi
 
     # Comment out some entries from the custom config file that may
@@ -304,13 +312,11 @@ fi
 
 %postun
 /sbin/ldconfig
-if [ $1 -eq 0 ]; then
-  touch --no-create %{_datadir}/icons/hicolor >&/dev/null || :
-  gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
+scrollkeeper-update
+touch --no-create %{_datadir}/icons/hicolor
+if [ -x /usr/bin/gtk-update-icon-cache ]; then
+  gtk-update-icon-cache -q %{_datadir}/icons/hicolor
 fi
-
-%posttrans
-gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
 
 %files -f gdm.lang
 %defattr(-, root, root)
@@ -398,6 +404,12 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
 %changelog
 * Mon Mar 29 2010 Matthias Clasen <mclasen@redhat.com> 2.30.0-1
 - Update to 2.30.0
+
+* Thu Mar 25 2010 Ray Strode <rstrode@redhat.com> 2.29.92-6
+- Fix up plymouth patch
+
+* Wed Mar 24 2010 Ray Strode <rstrode@redhat.com> 2.29.92-5
+- Add accounts service patch
 
 * Wed Mar 24 2010 Matthias Clasen <mclasen@redhat.com> 2.29.92-4
 - Drop hal dependency
