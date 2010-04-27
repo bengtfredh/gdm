@@ -14,7 +14,7 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 2.30.0
+Version: 2.30.2
 Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
@@ -402,6 +402,9 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Tue Apr 27 2010 Ray Strode <rstrode@redhat.com> 2.30.2-1
+- Update to 2.32.2
+
 * Mon Mar 29 2010 Matthias Clasen <mclasen@redhat.com> 2.30.0-1
 - Update to 2.30.0
 
