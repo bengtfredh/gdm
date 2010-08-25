@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.31.90
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -368,6 +368,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Wed Aug 25 2010 Ray Strode <rstrode@redhat.com> 2.31.90-2
+- Fix crash when autologin is enabled
+
 * Tue Aug 17 2010 Ray Strode <rstrode@redhat.com> 2.31.90-1
 - Update to 2.31.90
 
