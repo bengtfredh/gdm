@@ -1,0 +1,520 @@
+From 8f3588dcf2f1d7b5907c77bdf3d407e074f65b14 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Fri, 27 Aug 2010 17:57:18 -0400
+Subject: [PATCH 1/7] Emit changed signal whenever we do a GetAll call
+
+Previously we'd emit it after update_info, but at
+that point no properties have been changed yet,
+so its getting emitted prematurely.
+---
+ gui/simple-greeter/gdm-user.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-user.c b/gui/simple-greeter/gdm-user.c
+index 037b7e7..de46329 100644
+--- a/gui/simple-greeter/gdm-user.c
++++ b/gui/simple-greeter/gdm-user.c
+@@ -877,6 +877,8 @@ on_get_all_finished (DBusGProxy     *proxy,
+         g_hash_table_foreach (hash_table, (GHFunc) collect_props, user);
+         g_hash_table_unref (hash_table);
+ 
++        g_signal_emit (user, signals[CHANGED], 0);
++
+ out:
+         g_object_unref (proxy);
+ }
+@@ -925,9 +927,7 @@ changed_handler (DBusGProxy *proxy,
+ {
+         GdmUser *user = GDM_USER (data);
+ 
+-        if (update_info (user)) {
+-                g_signal_emit (user, signals[CHANGED], 0);
+-        }
++        update_info (user);
+ }
+ 
+ GdmUser *
+-- 
+1.7.2.2
+
+
+From b02dd2f7a684e36de84dfec778d6c4e39836efde Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Mon, 30 Aug 2010 13:49:58 -0400
+Subject: [PATCH 2/7] Add new 'is-loaded' property to user object
+
+Since the user objects are loaded asynchronously,
+there is a timeframe where they are incomplete.
+
+This commit adds an "is-loaded" property to
+GdmUser to mark when the user is fully loaded.
+---
+ gui/simple-greeter/gdm-user-manager.c |   40 +++++++++++++---
+ gui/simple-greeter/gdm-user.c         |   78 +++++++++++++++++++++++++++++++++
+ gui/simple-greeter/gdm-user.h         |    1 +
+ 3 files changed, 111 insertions(+), 8 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-user-manager.c b/gui/simple-greeter/gdm-user-manager.c
+index 40707b9..01117e2 100644
+--- a/gui/simple-greeter/gdm-user-manager.c
++++ b/gui/simple-greeter/gdm-user-manager.c
+@@ -758,27 +758,51 @@ remove_user (GdmUserManager *manager,
+ }
+ 
+ static void
+-on_new_user_changed (GdmUser        *user,
+-                     GdmUserManager *manager)
++on_new_user_loaded (GdmUser        *user,
++                    GParamSpec     *pspec,
++                    GdmUserManager *manager)
+ {
+         const char *username;
+ 
+-        username = gdm_user_get_user_name (user);
+-
+-        if (username == NULL) {
++        if (!gdm_user_is_loaded (user)) {
+                 return;
+         }
+ 
+-        g_signal_handlers_disconnect_by_func (user, on_new_user_changed, manager);
++        g_signal_handlers_disconnect_by_func (user, on_new_user_loaded, manager);
+         manager->priv->new_users = g_slist_remove (manager->priv->new_users,
+                                                    user);
+ 
++        username = gdm_user_get_user_name (user);
++
++        if (username == NULL) {
++                const char *object_path;
++
++                object_path = gdm_user_get_object_path (user);
++
++                if (object_path != NULL) {
++                        g_warning ("GdmUserManager: user has no username "
++                                   "(object path: %s, uid: %lu)",
++                                   object_path, gdm_user_get_uid (user));
++                } else {
++                        g_warning ("GdmUserManager: user has no username (uid: %lu)",
++                                   gdm_user_get_uid (user));
++                }
++                g_object_unref (user);
++                return;
++        }
++
+         if (username_in_exclude_list (manager, username)) {
+                 g_debug ("GdmUserManager: excluding user '%s'", username);
+                 g_object_unref (user);
+                 return;
+         }
+ 
++        /* User added already through alternative, but less authoratative means.
++         */
++        if (g_hash_table_lookup (manager->priv->users_by_name, username) != NULL) {
++                g_hash_table_remove (manager->priv->users_by_name, username);
++        }
++
+         add_user (manager, user);
+         g_object_unref (user);
+ }
+@@ -800,7 +824,7 @@ add_new_user_for_object_path (const char     *object_path,
+ 
+         manager->priv->new_users = g_slist_prepend (manager->priv->new_users, user);
+ 
+-        g_signal_connect (user, "changed", G_CALLBACK (on_new_user_changed), manager);
++        g_signal_connect (user, "notify::is-loaded", G_CALLBACK (on_new_user_loaded), manager);
+ }
+ 
+ static void
+@@ -2734,7 +2758,7 @@ gdm_user_manager_finalize (GObject *object)
+                 user = GDM_USER (node->data);
+                 next_node = node->next;
+ 
+-                g_signal_handlers_disconnect_by_func (user, on_new_user_changed, manager);
++                g_signal_handlers_disconnect_by_func (user, on_new_user_loaded, manager);
+                 g_object_unref (user);
+                 manager->priv->new_users = g_slist_delete_link (manager->priv->new_users, node);
+                 node = next_node;
+diff --git a/gui/simple-greeter/gdm-user.c b/gui/simple-greeter/gdm-user.c
+index de46329..25951ba 100644
+--- a/gui/simple-greeter/gdm-user.c
++++ b/gui/simple-greeter/gdm-user.c
+@@ -46,6 +46,11 @@
+ #define USER_ACCOUNTS_INTERFACE "org.freedesktop.Accounts.User"
+ 
+ enum {
++        PROP_0,
++        PROP_IS_LOADED
++};
++
++enum {
+         CHANGED,
+         SESSIONS_CHANGED,
+         LAST_SIGNAL
+@@ -66,6 +71,8 @@ struct _GdmUser {
+         char           *icon_file;
+         GList          *sessions;
+         gulong          login_frequency;
++
++        guint           is_loaded : 1;
+ };
+ 
+ typedef struct _GdmUserClass
+@@ -139,6 +146,43 @@ gdm_user_get_num_sessions (GdmUser    *user)
+ }
+ 
+ static void
++gdm_user_set_property (GObject        *object,
++                       guint           prop_id,
++                       const GValue   *value,
++                       GParamSpec     *pspec)
++{
++        GdmUser *user;
++
++        user = GDM_USER (object);
++
++        switch (prop_id) {
++        default:
++                G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
++                break;
++        }
++}
++
++static void
++gdm_user_get_property (GObject        *object,
++                       guint           prop_id,
++                       GValue         *value,
++                       GParamSpec     *pspec)
++{
++        GdmUser *user;
++
++        user = GDM_USER (object);
++
++        switch (prop_id) {
++        case PROP_IS_LOADED:
++                g_value_set_boolean (value, user->is_loaded);
++                break;
++        default:
++                G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
++                break;
++        }
++}
++
++static void
+ gdm_user_class_init (GdmUserClass *class)
+ {
+         GObjectClass *gobject_class;
+@@ -146,6 +190,16 @@ gdm_user_class_init (GdmUserClass *class)
+         gobject_class = G_OBJECT_CLASS (class);
+ 
+         gobject_class->finalize = gdm_user_finalize;
++        gobject_class->set_property = gdm_user_set_property;
++        gobject_class->get_property = gdm_user_get_property;
++
++        g_object_class_install_property (gobject_class,
++                                         PROP_IS_LOADED,
++                                         g_param_spec_boolean ("is-loaded",
++                                                               NULL,
++                                                               NULL,
++                                                               FALSE,
++                                                               G_PARAM_READABLE));
+ 
+         signals [CHANGED] =
+                 g_signal_new ("changed",
+@@ -209,6 +263,16 @@ gdm_user_finalize (GObject *object)
+                 (*G_OBJECT_CLASS (gdm_user_parent_class)->finalize) (object);
+ }
+ 
++static void
++set_is_loaded (GdmUser  *user,
++               gboolean  is_loaded)
++{
++        if (user->is_loaded != is_loaded) {
++                user->is_loaded = is_loaded;
++                g_object_notify (G_OBJECT (user), "is-loaded");
++        }
++}
++
+ /**
+  * _gdm_user_update_from_pwent:
+  * @user: the user object to update.
+@@ -297,6 +361,10 @@ _gdm_user_update_from_pwent (GdmUser             *user,
+                 changed = TRUE;
+         }
+ 
++        if (!user->is_loaded) {
++                set_is_loaded (user, TRUE);
++        }
++
+         if (changed) {
+                 g_signal_emit (user, signals[CHANGED], 0);
+         }
+@@ -877,6 +945,10 @@ on_get_all_finished (DBusGProxy     *proxy,
+         g_hash_table_foreach (hash_table, (GHFunc) collect_props, user);
+         g_hash_table_unref (hash_table);
+ 
++        if (!user->is_loaded) {
++                set_is_loaded (user, TRUE);
++        }
++
+         g_signal_emit (user, signals[CHANGED], 0);
+ 
+ out:
+@@ -958,3 +1030,9 @@ gdm_user_new_from_object_path (const gchar *object_path)
+         g_object_unref (user);
+         return NULL;
+ }
++
++gboolean
++gdm_user_is_loaded (GdmUser *user)
++{
++        return user->is_loaded;
++}
+diff --git a/gui/simple-greeter/gdm-user.h b/gui/simple-greeter/gdm-user.h
+index 2aee30a..4d6ced8 100644
+--- a/gui/simple-greeter/gdm-user.h
++++ b/gui/simple-greeter/gdm-user.h
+@@ -56,6 +56,7 @@ GdkPixbuf            *gdm_user_render_icon         (GdmUser   *user,
+ 
+ gint                  gdm_user_collate             (GdmUser   *user1,
+                                                     GdmUser   *user2);
++gboolean              gdm_user_is_loaded           (GdmUser *user);
+ 
+ G_END_DECLS
+ 
+-- 
+1.7.2.2
+
+
+From 658303e84af31a3b3d4cf2e6159dd2bb059881ed Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Mon, 30 Aug 2010 14:38:06 -0400
+Subject: [PATCH 3/7] If a user added early, drop it from list
+
+Since we support getting users from multiple sources,
+we may end up with the same user getting added to the list
+twice.  The accounts-service is the authoratative source,
+so if another source adds a user first then "undo" that user.
+---
+ gui/simple-greeter/gdm-user-manager.c |   16 +++++++++++-----
+ 1 files changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-user-manager.c b/gui/simple-greeter/gdm-user-manager.c
+index 01117e2..1407458 100644
+--- a/gui/simple-greeter/gdm-user-manager.c
++++ b/gui/simple-greeter/gdm-user-manager.c
+@@ -197,6 +197,7 @@ static void     queue_load_seat_and_users   (GdmUserManager *manager);
+ static void     monitor_local_users         (GdmUserManager *manager);
+ 
+ static void     load_new_session_incrementally (GdmUserManagerNewSession *new_session);
++static void     set_is_loaded (GdmUserManager *manager, gboolean is_loaded);
+ 
+ static gpointer user_manager_object = NULL;
+ 
+@@ -763,6 +764,7 @@ on_new_user_loaded (GdmUser        *user,
+                     GdmUserManager *manager)
+ {
+         const char *username;
++        GdmUser *old_user;
+ 
+         if (!gdm_user_is_loaded (user)) {
+                 return;
+@@ -797,14 +799,20 @@ on_new_user_loaded (GdmUser        *user,
+                 return;
+         }
+ 
+-        /* User added already through alternative, but less authoratative means.
++        old_user = g_hash_table_lookup (manager->priv->users_by_name, username);
++
++        /* If username got added earlier by a different means, trump it now.
+          */
+-        if (g_hash_table_lookup (manager->priv->users_by_name, username) != NULL) {
+-                g_hash_table_remove (manager->priv->users_by_name, username);
++        if (old_user != NULL) {
++                remove_user (manager, old_user);
+         }
+ 
+         add_user (manager, user);
+         g_object_unref (user);
++
++        if (manager->priv->new_users == NULL) {
++                set_is_loaded (manager, TRUE);
++        }
+ }
+ 
+ static void
+@@ -1137,8 +1145,6 @@ on_list_cached_users_finished (DBusGProxy     *proxy,
+                         }
+                 }
+         }
+-
+-        set_is_loaded (manager, TRUE);
+ }
+ 
+ static void
+-- 
+1.7.2.2
+
+
+From 395854d36caa3e10699c512d4227b6bcdad572fa Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Mon, 30 Aug 2010 14:55:35 -0400
+Subject: [PATCH 4/7] Don't mark list as loaded until accounts service chimes in
+
+---
+ gui/simple-greeter/gdm-user-manager.c |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-user-manager.c b/gui/simple-greeter/gdm-user-manager.c
+index 1407458..4ff850e 100644
+--- a/gui/simple-greeter/gdm-user-manager.c
++++ b/gui/simple-greeter/gdm-user-manager.c
+@@ -163,6 +163,7 @@ struct GdmUserManagerPrivate
+ 
+         gboolean               is_loaded;
+         gboolean               has_multiple_users;
++        gboolean               listing_cached_users;
+ };
+ 
+ enum {
+@@ -854,6 +855,7 @@ on_user_removed_in_accounts_service (DBusGProxy *proxy,
+         GdmUser        *user;
+ 
+         user = g_hash_table_lookup (manager->priv->users_by_object_path, object_path);
++
+         remove_user (manager, user);
+ }
+ 
+@@ -1106,6 +1108,7 @@ on_list_cached_users_finished (DBusGProxy     *proxy,
+         GError *error = NULL;
+         GPtrArray *paths;
+ 
++        manager->priv->listing_cached_users = FALSE;
+         if (!dbus_g_proxy_end_call (proxy,
+                                     call_id,
+                                     &error,
+@@ -1748,6 +1751,10 @@ maybe_set_is_loaded (GdmUserManager *manager)
+                 return;
+         }
+ 
++        if (manager->priv->listing_cached_users) {
++                return;
++        }
++
+         /* Don't set is_loaded yet unless the seat is already loaded
+          * or failed to load.
+          */
+@@ -2364,6 +2371,7 @@ load_users (GdmUserManager *manager)
+                                  manager,
+                                  NULL,
+                                  G_TYPE_INVALID);
++        manager->priv->listing_cached_users = TRUE;
+ }
+ 
+ static void
+-- 
+1.7.2.2
+
+
+From 91f8593e5d259f7e6b32f1afa29fa49dffa5f21a Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Tue, 31 Aug 2010 14:07:46 -0400
+Subject: [PATCH 5/7] Don't emit 'user-removed' if list isn't loaded
+
+We don't want to emit add or removed signals before
+loading.
+---
+ gui/simple-greeter/gdm-user-manager.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-user-manager.c b/gui/simple-greeter/gdm-user-manager.c
+index 4ff850e..ddb6070 100644
+--- a/gui/simple-greeter/gdm-user-manager.c
++++ b/gui/simple-greeter/gdm-user-manager.c
+@@ -750,7 +750,10 @@ remove_user (GdmUserManager *manager,
+                 g_hash_table_remove (manager->priv->users_by_object_path, gdm_user_get_object_path (user));
+         }
+         g_hash_table_remove (manager->priv->users_by_name, gdm_user_get_user_name (user));
+-        g_signal_emit (manager, signals[USER_REMOVED], 0, user);
++
++        if (manager->priv->is_loaded) {
++                g_signal_emit (manager, signals[USER_REMOVED], 0, user);
++        }
+ 
+         g_object_unref (user);
+ 
+-- 
+1.7.2.2
+
+
+From ea8538cac4c6f48bffe8a4cbf67ca2fb317838a5 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Tue, 31 Aug 2010 14:03:01 -0400
+Subject: [PATCH 6/7] Remove user from new-users list if removed from accounts service
+
+---
+ gui/simple-greeter/gdm-user-manager.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-user-manager.c b/gui/simple-greeter/gdm-user-manager.c
+index ddb6070..138fbb6 100644
+--- a/gui/simple-greeter/gdm-user-manager.c
++++ b/gui/simple-greeter/gdm-user-manager.c
+@@ -859,6 +859,8 @@ on_user_removed_in_accounts_service (DBusGProxy *proxy,
+ 
+         user = g_hash_table_lookup (manager->priv->users_by_object_path, object_path);
+ 
++        manager->priv->new_users = g_slist_remove (manager->priv->new_users, user);
++
+         remove_user (manager, user);
+ }
+ 
+-- 
+1.7.2.2
+
+
+From 0df669070bfa550af9830deb0c17273529743970 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Tue, 31 Aug 2010 13:36:20 -0400
+Subject: [PATCH 7/7] Fire off loading user images after chooser is mapped
+
+The update_visible_items function calls gtk_tree_view_get_visible_range
+which seems to only work after the tree view is mapped.
+
+This commit makes sure that we queue an update after the widget is
+mapped.
+
+(seems to a fix a problem where users face icons don't always show up)
+---
+ gui/simple-greeter/gdm-chooser-widget.c |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-chooser-widget.c b/gui/simple-greeter/gdm-chooser-widget.c
+index 9e3ae73..043928d 100644
+--- a/gui/simple-greeter/gdm-chooser-widget.c
++++ b/gui/simple-greeter/gdm-chooser-widget.c
+@@ -1362,6 +1362,14 @@ gdm_chooser_widget_show (GtkWidget *widget)
+ }
+ 
+ static void
++gdm_chooser_widget_map (GtkWidget *widget)
++{
++        queue_update_visible_items (GDM_CHOOSER_WIDGET (widget));
++
++        GTK_WIDGET_CLASS (gdm_chooser_widget_parent_class)->map (widget);
++}
++
++static void
+ gdm_chooser_widget_size_allocate (GtkWidget     *widget,
+                                   GtkAllocation *allocation)
+ {
+@@ -1420,6 +1428,7 @@ gdm_chooser_widget_class_init (GdmChooserWidgetClass *klass)
+         widget_class->size_allocate = gdm_chooser_widget_size_allocate;
+         widget_class->hide = gdm_chooser_widget_hide;
+         widget_class->show = gdm_chooser_widget_show;
++        widget_class->map = gdm_chooser_widget_map;
+         widget_class->focus = gdm_chooser_widget_focus;
+         widget_class->focus_in_event = gdm_chooser_widget_focus_in_event;
+ 
+-- 
+1.7.2.2
+

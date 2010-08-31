@@ -1,0 +1,28 @@
+From bf392b8b48cae7f1a5d32fb715c70f359633b421 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Fri, 27 Aug 2010 17:35:59 -0400
+Subject: [PATCH] Don't destroy shells hash table if we never made it
+
+---
+ gui/simple-greeter/gdm-user-manager.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-user-manager.c b/gui/simple-greeter/gdm-user-manager.c
+index 0069480..e3bea4a 100644
+--- a/gui/simple-greeter/gdm-user-manager.c
++++ b/gui/simple-greeter/gdm-user-manager.c
+@@ -2792,7 +2792,10 @@ gdm_user_manager_finalize (GObject *object)
+         if (manager->priv->shells_monitor != NULL) {
+                 g_file_monitor_cancel (manager->priv->shells_monitor);
+         }
+-        g_hash_table_destroy (manager->priv->shells);
++
++        if (manager->priv->shells != NULL) {
++                g_hash_table_destroy (manager->priv->shells);
++        }
+ 
+         G_OBJECT_CLASS (gdm_user_manager_parent_class)->finalize (object);
+ }
+-- 
+1.7.2.2
+
