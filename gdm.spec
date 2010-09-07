@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.31.90
-Release: 3%{?dist}
+Release: 4%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -374,6 +374,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Tue Sep 07 2010 Ray Strode <rstrode@redhat.com> 2.31.90-4
+- Fix user switch name
+
 * Tue Aug 31 2010 Ray Strode <rstrode@redhat.com> 2.31.90-3
 - Fix icons in user list
 
