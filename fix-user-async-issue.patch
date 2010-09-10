@@ -744,3 +744,322 @@ index 66479fa..edb69e4 100644
 -- 
 1.7.2.2
 
+From 752ec6de8a6e66ce002a89c52fb0308791b40bf7 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Fri, 10 Sep 2010 13:27:52 -0400
+Subject: [PATCH 1/5] Fix typo when disconnecting signal handler
+
+We were disconnecting the wrong one.
+---
+ gui/user-switch-applet/applet.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/gui/user-switch-applet/applet.c b/gui/user-switch-applet/applet.c
+index edb69e4..4a4b41d 100644
+--- a/gui/user-switch-applet/applet.c
++++ b/gui/user-switch-applet/applet.c
+@@ -481,7 +481,7 @@ gdm_applet_data_free (GdmAppletData *adata)
+         gconf_client_notify_remove (adata->client, adata->client_notify_lockdown_id);
+ 
+         if (adata->user_loaded_notify_id != 0) {
+-                g_signal_handler_disconnect (adata->user, adata->user_changed_notify_id);
++                g_signal_handler_disconnect (adata->user, adata->user_loaded_notify_id);
+         }
+ 
+         if (adata->user_changed_notify_id != 0) {
+-- 
+1.7.2.3
+
+
+From ad1cd9c302d8dec51ae62bcf9ba4cc132b584364 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Fri, 10 Sep 2010 13:28:57 -0400
+Subject: [PATCH 2/5] Only disconnect loaded handler if connected
+
+---
+ gui/user-switch-applet/applet.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
+
+diff --git a/gui/user-switch-applet/applet.c b/gui/user-switch-applet/applet.c
+index 4a4b41d..a0da74c 100644
+--- a/gui/user-switch-applet/applet.c
++++ b/gui/user-switch-applet/applet.c
+@@ -1274,7 +1274,9 @@ setup_current_user_now (GdmAppletData *adata)
+ {
+         g_assert (adata->user != NULL);
+ 
+-        g_signal_handler_disconnect (adata->user, adata->user_loaded_notify_id);
++        if (adata->user_loaded_notify_id != 0) {
++                g_signal_handler_disconnect (adata->user, adata->user_loaded_notify_id);
++        }
+         adata->user_loaded_notify_id = 0;
+ 
+         update_label (adata);
+-- 
+1.7.2.3
+
+
+From 48570e22f4893c7088abc51f1de9bacfb772b13c Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Fri, 10 Sep 2010 09:57:30 -0400
+Subject: [PATCH 3/5] Drop gdm_user_new_from_object_path for _gdm_user_update_from_object_path
+
+This is how it works with pwent, and it has the advantage of letting us
+create a stub user object destined to come from the accounts service
+before we know its object path.
+---
+ gui/simple-greeter/gdm-user-manager.c |    7 ++-----
+ gui/simple-greeter/gdm-user-private.h |    3 +++
+ gui/simple-greeter/gdm-user.c         |   24 +++++++++++++++---------
+ 3 files changed, 20 insertions(+), 14 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-user-manager.c b/gui/simple-greeter/gdm-user-manager.c
+index 4382481..eecf9dc 100644
+--- a/gui/simple-greeter/gdm-user-manager.c
++++ b/gui/simple-greeter/gdm-user-manager.c
+@@ -830,11 +830,8 @@ add_new_user_for_object_path (const char     *object_path,
+         if (user != NULL) {
+                 return user;
+         }
+-        user = gdm_user_new_from_object_path (object_path);
+-
+-        if (user == NULL) {
+-                return NULL;
+-        }
++        user = g_object_new (GDM_TYPE_USER, NULL);
++        _gdm_user_update_from_object_path (user, object_path);
+ 
+         manager->priv->new_users = g_slist_prepend (manager->priv->new_users, user);
+ 
+diff --git a/gui/simple-greeter/gdm-user-private.h b/gui/simple-greeter/gdm-user-private.h
+index 16ff415..a248532 100644
+--- a/gui/simple-greeter/gdm-user-private.h
++++ b/gui/simple-greeter/gdm-user-private.h
+@@ -30,6 +30,9 @@
+ 
+ G_BEGIN_DECLS
+ 
++void _gdm_user_update_from_object_path (GdmUser    *user,
++                                        const char *object_path);
++
+ void _gdm_user_update_from_pwent (GdmUser             *user,
+                                   const struct passwd *pwent);
+ 
+diff --git a/gui/simple-greeter/gdm-user.c b/gui/simple-greeter/gdm-user.c
+index 25951ba..317b721 100644
+--- a/gui/simple-greeter/gdm-user.c
++++ b/gui/simple-greeter/gdm-user.c
+@@ -1002,12 +1002,22 @@ changed_handler (DBusGProxy *proxy,
+         update_info (user);
+ }
+ 
+-GdmUser *
+-gdm_user_new_from_object_path (const gchar *object_path)
++/**
++ * _gdm_user_update_from_object_path:
++ * @user: the user object to update.
++ * @object_path: the object path of the user to use.
++ *
++ * Updates the properties of @user from the accounts service via
++ * the object path in @object_path.
++ **/
++void
++_gdm_user_update_from_object_path (GdmUser    *user,
++                                   const char *object_path)
+ {
+-        GdmUser *user;
++        g_return_if_fail (GDM_IS_USER (user));
++        g_return_if_fail (object_path != NULL);
++        g_return_if_fail (user->object_path == NULL);
+ 
+-        user = (GdmUser *)g_object_new (GDM_TYPE_USER, NULL);
+         user->object_path = g_strdup (object_path);
+ 
+         user->accounts_proxy = dbus_g_proxy_new_for_name (user->connection,
+@@ -1021,14 +1031,10 @@ gdm_user_new_from_object_path (const gchar *object_path)
+                                      G_CALLBACK (changed_handler), user, NULL);
+ 
+         if (!update_info (user)) {
+-                goto error;
++                g_warning ("Couldn't update info for user with object path %s", object_path);
+         }
+ 
+-        return user;
+-
+- error:
+         g_object_unref (user);
+-        return NULL;
+ }
+ 
+ gboolean
+-- 
+1.7.2.3
+
+
+From 10d14fb3d057f5fa3ddecd43aaf68b73d1f68771 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Fri, 10 Sep 2010 10:23:53 -0400
+Subject: [PATCH 4/5] Add create_new_user function
+
+This function wraps g_object_new (GDM_TYPE_USER, NULL),
+and sets up the signal handler to detect when the user is loaded.
+
+This allows us to handle new users from pwent entries in the same
+way we handle new users from object paths, via the
+on_new_user_loaded function.
+---
+ gui/simple-greeter/gdm-user-manager.c |   37 +++++++++++++++++++++++++--------
+ 1 files changed, 28 insertions(+), 9 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-user-manager.c b/gui/simple-greeter/gdm-user-manager.c
+index eecf9dc..6964415 100644
+--- a/gui/simple-greeter/gdm-user-manager.c
++++ b/gui/simple-greeter/gdm-user-manager.c
+@@ -200,6 +200,10 @@ static void     monitor_local_users         (GdmUserManager *manager);
+ static void     load_new_session_incrementally (GdmUserManagerNewSession *new_session);
+ static void     set_is_loaded (GdmUserManager *manager, gboolean is_loaded);
+ 
++static void     on_new_user_loaded (GdmUser        *user,
++                                    GParamSpec     *pspec,
++                                    GdmUserManager *manager);
++
+ static gpointer user_manager_object = NULL;
+ 
+ G_DEFINE_TYPE (GdmUserManager, gdm_user_manager, G_TYPE_OBJECT)
+@@ -684,6 +688,27 @@ set_has_multiple_users (GdmUserManager *manager,
+                 g_object_notify (G_OBJECT (manager), "has-multiple-users");
+         }
+ }
++static void
++on_new_user_destroyed (GdmUserManager *manager,
++                       GdmUser        *user)
++{
++        manager->priv->new_users = g_slist_remove (manager->priv->new_users, user);
++}
++
++static GdmUser *
++create_new_user (GdmUserManager *manager)
++{
++        GdmUser *user;
++
++        user = g_object_new (GDM_TYPE_USER, NULL);
++
++        manager->priv->new_users = g_slist_prepend (manager->priv->new_users, user);
++        g_object_weak_ref (G_OBJECT (user), (GWeakNotify) on_new_user_destroyed, manager);
++
++        g_signal_connect (user, "notify::is-loaded", G_CALLBACK (on_new_user_loaded), manager);
++
++        return user;
++}
+ 
+ static void
+ add_user (GdmUserManager *manager,
+@@ -728,13 +753,9 @@ add_new_user_for_pwent (GdmUserManager *manager,
+ 
+         g_debug ("GdmUserManager: Creating new user from password entry: %s", pwent->pw_name);
+ 
+-        user = g_object_new (GDM_TYPE_USER, NULL);
++        user = create_new_user (manager);
+         _gdm_user_update_from_pwent (user, pwent);
+ 
+-        /* increases ref count */
+-        add_user (manager, user);
+-        g_object_unref (user);
+-
+         return user;
+ }
+ 
+@@ -777,6 +798,7 @@ on_new_user_loaded (GdmUser        *user,
+         g_signal_handlers_disconnect_by_func (user, on_new_user_loaded, manager);
+         manager->priv->new_users = g_slist_remove (manager->priv->new_users,
+                                                    user);
++        g_object_weak_unref (G_OBJECT (user), (GWeakNotify) on_new_user_destroyed, manager);
+ 
+         username = gdm_user_get_user_name (user);
+ 
+@@ -830,12 +852,9 @@ add_new_user_for_object_path (const char     *object_path,
+         if (user != NULL) {
+                 return user;
+         }
+-        user = g_object_new (GDM_TYPE_USER, NULL);
++        user = create_new_user (manager);
+         _gdm_user_update_from_object_path (user, object_path);
+ 
+-        manager->priv->new_users = g_slist_prepend (manager->priv->new_users, user);
+-
+-        g_signal_connect (user, "notify::is-loaded", G_CALLBACK (on_new_user_loaded), manager);
+         return user;
+ }
+ 
+-- 
+1.7.2.3
+
+
+From 02f11f48cb6a22b330512c7264e4baea594e6e33 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Fri, 10 Sep 2010 10:40:49 -0400
+Subject: [PATCH 5/5] Use create_new_user in get_user call
+
+Previously, we would call two different constructors, depending
+on whether or not the user was coming from the accounts service
+or the nsswitch.  Now we create a new "unloaded" user immediately,
+and just call the relevant update function to load the user.
+---
+ gui/simple-greeter/gdm-user-manager.c |   22 ++++++----------------
+ 1 files changed, 6 insertions(+), 16 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-user-manager.c b/gui/simple-greeter/gdm-user-manager.c
+index 6964415..bd36380 100644
+--- a/gui/simple-greeter/gdm-user-manager.c
++++ b/gui/simple-greeter/gdm-user-manager.c
+@@ -745,20 +745,6 @@ add_user (GdmUserManager *manager,
+         }
+ }
+ 
+-static GdmUser *
+-add_new_user_for_pwent (GdmUserManager *manager,
+-                        struct passwd  *pwent)
+-{
+-        GdmUser *user;
+-
+-        g_debug ("GdmUserManager: Creating new user from password entry: %s", pwent->pw_name);
+-
+-        user = create_new_user (manager);
+-        _gdm_user_update_from_pwent (user, pwent);
+-
+-        return user;
+-}
+-
+ static void
+ remove_user (GdmUserManager *manager,
+              GdmUser        *user)
+@@ -1576,20 +1562,24 @@ gdm_user_manager_get_user (GdmUserManager *manager,
+ 
+         /* if we don't have it loaded try to load it now */
+         if (user == NULL) {
++                user = create_new_user (manager);
++
+                 if (manager->priv->accounts_proxy != NULL) {
+                         char *object_path;
+ 
+                         object_path = get_user_object_path_from_accounts_service (manager, username);
+ 
+                         if (object_path != NULL) {
+-                                user = add_new_user_for_object_path (object_path, manager);
++                                _gdm_user_update_from_object_path (user, object_path);
+                                 g_free (object_path);
+                         }
+                 } else {
+                         struct passwd *pwent;
++
+                         get_pwent_for_name (username, &pwent);
++
+                         if (pwent != NULL) {
+-                                user = add_new_user_for_pwent (manager, pwent);
++                                _gdm_user_update_from_pwent (user, pwent);
+                         }
+                 }
+         }
+-- 
+1.7.2.3
+
