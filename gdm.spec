@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.31.90
-Release: 5%{?dist}
+Release: 6%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -374,6 +374,11 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Mon Sep 13 2010 Ray Strode <rstrode@redhat.com> 2.31.90-6
+- Fix crashing-in-a-loop gdm when accounts service is enabled
+  (caused by -5)
+  Resolves: #632818
+
 * Fri Sep 10 2010 Ray Strode <rstrode@redhat.com> 2.31.90-5
 - Fix user switch applet when accounts service is disabled
   Resolves: #632490
