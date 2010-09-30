@@ -87,9 +87,6 @@ Provides: service(graphical-login) = %{name}
 
 Requires: audit-libs >= %{libauditver}
 Patch2: plymouth.patch
-Patch3: fix-accounts-activation.patch
-Patch4: fix-hash-table-issue.patch
-Patch5: fix-user-async-issue.patch
 
 Patch96: gdm-multistack.patch
 # Fedora-specific
@@ -133,9 +130,6 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %prep
 %setup -q
 %patch2 -p1 -b .plymouth
-%patch3 -p1 -b .fix-accounts-activation
-%patch4 -p1 -b .fix-hash-table-issue
-%patch5 -p1 -b .fix-user-async-issue
 %patch96 -p1 -b .multistack
 %patch97 -p1 -b .bubble-location
 %patch98 -p1 -b .tray-padding
@@ -307,7 +301,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
 %config %{_sysconfdir}/pam.d/gdm-password
 # not config files
 %{_sysconfdir}/gdm/Xsession
-%{_sysconfdir}/gdm/gdm.schemas
+%{_datadir}/gdm/gdm.schemas
 %{_sysconfdir}/dbus-1/system.d/gdm.conf
 %dir %{_sysconfdir}/gdm/Init
 %dir %{_sysconfdir}/gdm/PreSession
@@ -374,7 +368,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
-* Thu Sep 30 2010 Matthias Clasen <mclasen@redhat.com> 2.32.0-1
+* Thu Sep 30 2010 Ray Strode <rstrode@redhat.com> 2.32.0-1
 - Update to 2.32.0
 
 * Wed Sep 15 2010 Ray Strode <rstrode@redhat.com> 2.31.90-7
