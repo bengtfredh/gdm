@@ -14,7 +14,7 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 2.32.0
+Version: 2.32.1
 Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
@@ -80,7 +80,6 @@ BuildRequires: check-devel
 BuildRequires: iso-codes-devel
 BuildRequires: gnome-panel-devel
 BuildRequires: libxklavier-devel >= 4.0
-BuildRequires: DeviceKit-power-devel >= 008
 BuildRequires: libXdmcp-devel
 
 Provides: service(graphical-login) = %{name}
@@ -369,7 +368,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
 
 %changelog
 * Thu Sep 30 2010 Ray Strode <rstrode@redhat.com> 2.32.0-1
-- Update to 2.32.0
+- Update to 2.32.0 (CVE-2011-0727)
+  Resolves: #691496
 
 * Wed Sep 15 2010 Ray Strode <rstrode@redhat.com> 2.31.90-7
 - More user switch applet fixes
