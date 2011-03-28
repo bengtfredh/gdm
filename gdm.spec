@@ -95,6 +95,7 @@ Patch2: plymouth.patch
 
 # https://bugzilla.gnome.org/show_bug.cgi?id=610179
 Patch3: accounts-service.patch
+Patch4: CVE-2011-0727.patch
 
 Patch96: gdm-multistack.patch
 # Fedora-specific
@@ -141,6 +142,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %setup -q
 %patch2 -p1 -b .plymouth
 %patch3 -p1 -b .accounts-service
+%patch4 -p1 -b .CVE-2011-0727
 %patch96 -p1 -b .multistack
 %patch97 -p1 -b .bubble-location
 %patch98 -p1 -b .tray-padding
