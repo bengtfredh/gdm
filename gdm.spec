@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.30.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -404,6 +404,10 @@ fi
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Mon Mar 28 2011 Ray Strode <rstrode@redhat.com> 2.30.2-2
+- CVE-2011-0727
+  Resolves: #691496
+
 * Tue Apr 27 2010 Ray Strode <rstrode@redhat.com> 2.30.2-1
 - Update to 2.32.2
 
