@@ -372,7 +372,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
 - Add big upower support which was mistakenly dropped.
 - Fix changelog mess up.
 
-* Mon Mar 28 2010 Ray Strode <rstrode@redhat.com> 2.32.1-1
+* Mon Mar 28 2011 Ray Strode <rstrode@redhat.com> 2.32.1-1
 - Update to 2.32.1 (CVE-2011-0727)
   Resolves: #691496
 
