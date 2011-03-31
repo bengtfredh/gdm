@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 2.32.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -80,6 +80,7 @@ BuildRequires: check-devel
 BuildRequires: iso-codes-devel
 BuildRequires: gnome-panel-devel
 BuildRequires: libxklavier-devel >= 4.0
+BuildRequires: DeviceKit-power-devel >= 008
 BuildRequires: libXdmcp-devel
 
 Provides: service(graphical-login) = %{name}
@@ -367,9 +368,16 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
-* Thu Sep 30 2010 Ray Strode <rstrode@redhat.com> 2.32.0-1
-- Update to 2.32.0 (CVE-2011-0727)
+* Thu Mar 31 2011 Ray Strode <rstrode@redhat.com> 2.32.1-2
+- Add big upower support which was mistakenly dropped.
+- Fix changelog mess up.
+
+* Mon Mar 28 2010 Ray Strode <rstrode@redhat.com> 2.32.1-1
+- Update to 2.32.1 (CVE-2011-0727)
   Resolves: #691496
+
+* Thu Sep 30 2010 Ray Strode <rstrode@redhat.com> 2.32.0-1
+- Update to 2.32.0
 
 * Wed Sep 15 2010 Ray Strode <rstrode@redhat.com> 2.31.90-7
 - More user switch applet fixes
