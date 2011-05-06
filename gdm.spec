@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.0.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -98,6 +98,7 @@ Requires: audit-libs >= %{libauditver}
 Requires: system-icon-theme
 
 Patch2: plymouth.patch
+Patch3: fix-double-free.patch
 
 Patch96: gdm-multistack.patch
 # Fedora-specific
@@ -128,6 +129,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %prep
 %setup -q
 %patch2 -p1 -b .plymouth
+%patch3 -p1 -b .fix-double-free
 %patch96 -p1 -b .multistack
 %patch99 -p1 -b .fedora-logo
 
@@ -356,6 +358,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Fri May 06 2011 Ray Strode <rstrode@redhat.com> 3.0.0-3
+- Fix double free (bug 690873)
+
 * Fri Apr 15 2011 Matthias Clasen <mclasen@redhat.com> - 3.0.0-2
 - Put the Fedora logo back in the greeter
 

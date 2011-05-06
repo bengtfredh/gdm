@@ -276,7 +276,7 @@ index 66d1c77..4703537 100644
 +                g_error_free (error);
 +                return FALSE;
 +        }
-+
++        g_debug ("plymouth is%s running", WIFEXITED (status) && WEXITSTATUS (status) == 0? "" : " not");
 +        return WIFEXITED (status) && WEXITSTATUS (status) == 0;
 +}
 +
@@ -285,7 +285,7 @@ index 66d1c77..4703537 100644
 +{
 +        gboolean res;
 +        GError  *error;
-+
++        g_debug ("deactivating plymouth");
 +        error = NULL;
 +        res = g_spawn_command_line_sync ("/bin/plymouth deactivate",
 +                                         NULL, NULL, NULL, &error);
@@ -300,7 +300,7 @@ index 66d1c77..4703537 100644
 +{
 +        gboolean res;
 +        GError  *error;
-+
++        g_debug ("quitting plymouth with transition");
 +        error = NULL;
 +        res = g_spawn_command_line_sync ("/bin/plymouth quit --retain-splash",
 +                                         NULL, NULL, NULL, &error);
@@ -316,7 +316,7 @@ index 66d1c77..4703537 100644
 +{
 +        gboolean res;
 +        GError  *error;
-+
++        g_debug ("quitting plymouth without transition");
 +        error = NULL;
 +        res = g_spawn_command_line_sync ("/bin/plymouth quit",
 +                                         NULL, NULL, NULL, &error);
