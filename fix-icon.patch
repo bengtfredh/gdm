@@ -1,0 +1,43 @@
+From ae0b1d334956fbb7b0a677a462aefdf9c46ecde4 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Thu, 12 May 2011 14:36:10 -0400
+Subject: [PATCH] greeter: force symbolic icons in panel
+
+gtk falls back to non-symbolic icons before looking
+for symbolic icons in parent icon themes.
+
+For the greeeter panel, though, any symbolic icon is better than a
+non-symblic icon, so that behavior is wrong.
+
+This commit changes gdm to not check for fallbacks in the absense of
+a symblic icon. The icons we care about are shipped in the base
+icon theme anyway, so we can depend on them being available.
+---
+ gui/simple-greeter/gdm-greeter-panel.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gui/simple-greeter/gdm-greeter-panel.c b/gui/simple-greeter/gdm-greeter-panel.c
+index 8176bf8..f3f192a 100644
+--- a/gui/simple-greeter/gdm-greeter-panel.c
++++ b/gui/simple-greeter/gdm-greeter-panel.c
+@@ -889,7 +889,7 @@ add_shutdown_menu (GdmGreeterPanel *panel)
+         image = gtk_image_new ();
+         override_style (image);
+ 
+-        gicon = g_themed_icon_new_with_default_fallbacks ("system-shutdown-symbolic");
++        gicon = g_themed_icon_new ("system-shutdown-symbolic");
+         gtk_image_set_from_gicon (GTK_IMAGE (image), gicon, GTK_ICON_SIZE_MENU);
+         g_object_unref (gicon);
+ 
+@@ -953,7 +953,7 @@ add_battery_menu (GdmGreeterPanel *panel)
+         panel->priv->power_image = gtk_image_new ();
+         override_style (panel->priv->power_image);
+ 
+-        gicon = g_themed_icon_new_with_default_fallbacks ("battery-caution-symbolic");
++        gicon = g_themed_icon_new ("battery-caution-symbolic");
+         gtk_image_set_from_gicon (GTK_IMAGE (panel->priv->power_image), gicon, GTK_ICON_SIZE_MENU);
+         g_object_unref (gicon);
+ 
+-- 
+1.7.5
+
