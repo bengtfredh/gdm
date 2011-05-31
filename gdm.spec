@@ -14,8 +14,8 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 3.0.0
-Release: 4%{?dist}
+Version: 3.0.4
+Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -130,8 +130,6 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %prep
 %setup -q
 %patch2 -p1 -b .plymouth
-%patch3 -p1 -b .fix-double-free
-%patch4 -p1 -b .fix-icon
 %patch96 -p1 -b .multistack
 %patch99 -p1 -b .fedora-logo
 
@@ -360,6 +358,10 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
 %{_libdir}/gdm/simple-greeter/plugins/fingerprint.so
 
 %changelog
+* Tue May 31 2011 Ray Strode <rstrode@redhat.com> 3.0.4-1
+- Update to latest version
+  Resolves CVE-2011-1709
+
 * Thu May 12 2011 Ray Strode <rstrode@redhat.com> 3.0.0-4
 - Make power off icon symbolic
   Resolves: #704033
