@@ -98,8 +98,7 @@ Requires: audit-libs >= %{libauditver}
 Requires: system-icon-theme
 
 Patch2: plymouth.patch
-Patch3: fix-double-free.patch
-Patch4: fix-icon.patch
+Patch3: fix-dconf-db-thing.patch
 
 Patch96: gdm-multistack.patch
 # Fedora-specific
@@ -130,6 +129,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %prep
 %setup -q
 %patch2 -p1 -b .plymouth
+%patch3 -p1 -b .fix-dconf-db-thing
 %patch96 -p1 -b .multistack
 %patch99 -p1 -b .fedora-logo
 
@@ -339,6 +339,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/ull || :
 %attr(1770, root, gdm) %dir %{_localstatedir}/gdm
 %attr(1777, root, gdm) %dir %{_localstatedir}/run/gdm
 %attr(1755, root, gdm) %dir %{_localstatedir}/cache/gdm
+%{_localstatedir}/lib/gdm/.local/share/applications/mime-dummy-handler.desktop
+%{_localstatedir}/lib/gdm/.local/share/applications/mimeapps.list
 %{_sysconfdir}/dconf/profile/gdm
 %{_sysconfdir}/dconf/db/gdm
 
