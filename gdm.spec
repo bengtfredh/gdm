@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.1.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -24,6 +24,7 @@ URL: http://download.gnome.org/sources/gdm
 Source: http://download.gnome.org/sources/gdm/2.91/gdm-%{version}.tar.xz
 Source1: gdm-pam
 Source2: gdm-autologin-pam
+Source11: gdm-welcome-pam
 Source3: gdm-password.pam
 Source4: gdm-smartcard.pam
 Source5: gdm-fingerprint.pam
@@ -99,6 +100,7 @@ Requires: system-icon-theme
 
 Patch0: fix-build.patch
 Patch1: disable-fatal-criticals.patch
+Patch2: 0001-welcome-register-in-PAM-in-addition-to-ConsoleKit.patch
 
 # Fedora-specific
 Patch98: plymouth.patch
@@ -130,6 +132,7 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 %setup -q
 %patch0 -p1 -b .fix-build
 %patch1 -p1 -b .disable-fatal-criticals
+%patch2 -p1 -b .welcome-pam
 %patch98 -p1 -b .plymouth
 %patch99 -p1 -b .fedora-logo
 
@@ -141,6 +144,7 @@ rm data/dconf-override-db
 %build
 cp -f %{SOURCE1} data/gdm
 cp -f %{SOURCE2} data/gdm-autologin
+cp -f %{SOURCE11} data/gdm-welcome
 cp -f %{SOURCE3} gui/simple-greeter/extensions/password/gdm-password.pam
 cp -f %{SOURCE4} gui/simple-greeter/extensions/smartcard/gdm-smartcard.pam
 cp -f %{SOURCE5} gui/simple-greeter/extensions/fingerprint/gdm-fingerprint.pam
@@ -289,6 +293,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %config %{_sysconfdir}/pam.d/gdm
 %config %{_sysconfdir}/pam.d/gdm-autologin
 %config %{_sysconfdir}/pam.d/gdm-password
+%config %{_sysconfdir}/pam.d/gdm-welcome
 # not config files
 %{_sysconfdir}/gdm/Xsession
 %{_datadir}/gdm/gdm.schemas
@@ -364,6 +369,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/gdm/simple-greeter/extensions/libfingerprint.so
 
 %changelog
+* Wed Aug  3 2011 Lennart Poettering <lpoetter@redhat.com> - 1:3.1.2-4
+- Register welcome pseudo-session in PAM
+
 * Tue Jun 28 2011 Ray Strode <rstrode@redhat.com> 3.1.2-3
 - Disable fatal critcals
   Resolves: #717324
