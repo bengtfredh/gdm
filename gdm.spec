@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.1.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -369,6 +369,11 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/gdm/simple-greeter/extensions/libfingerprint.so
 
 %changelog
+* Tue Aug 09 2011 Ray Strode <rstrode@redhat.com> 3.1.2-5
+- Lock down the pam config, so we don't run the greeter
+  with unconfined/elevated privileges
+  Resolves: #729302
+
 * Wed Aug  3 2011 Lennart Poettering <lpoetter@redhat.com> - 1:3.1.2-4
 - Register welcome pseudo-session in PAM
 
