@@ -14,8 +14,8 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 3.1.2
-Release: 5%{?dist}
+Version: 3.1.90
+Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -98,10 +98,6 @@ Requires: audit-libs >= %{libauditver}
 # how well this will work with generic logos, though
 Requires: system-icon-theme
 
-Patch0: fix-build.patch
-Patch1: disable-fatal-criticals.patch
-Patch2: 0001-welcome-register-in-PAM-in-addition-to-ConsoleKit.patch
-
 # Fedora-specific
 Patch98: plymouth.patch
 Patch99: gdm-3.0.0-fedora-logo.patch
@@ -130,9 +126,6 @@ The GDM fingerprint plugin provides functionality necessary to use a fingerprint
 
 %prep
 %setup -q
-%patch0 -p1 -b .fix-build
-%patch1 -p1 -b .disable-fatal-criticals
-%patch2 -p1 -b .welcome-pam
 %patch98 -p1 -b .plymouth
 %patch99 -p1 -b .fedora-logo
 
@@ -282,7 +275,6 @@ fi
 gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 
 %files -f gdm.lang
-%defattr(-, root, root)
 %doc AUTHORS COPYING NEWS README TODO
 %dir %{_sysconfdir}/gdm
 %config(noreplace) %{_sysconfdir}/gdm/custom.conf
@@ -354,7 +346,6 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_sysconfdir}/dconf/db/gdm
 
 %files plugin-smartcard
-%defattr(-, root, root)
 %config %{_sysconfdir}/pam.d/gdm-smartcard
 %dir %{_datadir}/gdm/simple-greeter/extensions/smartcard
 %{_datadir}/gdm/simple-greeter/extensions/smartcard/page.ui
@@ -362,13 +353,15 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libexecdir}/gdm-smartcard-worker
 
 %files plugin-fingerprint
-%defattr(-, root, root)
 %config %{_sysconfdir}/pam.d/gdm-fingerprint
 %dir %{_datadir}/gdm/simple-greeter/extensions/fingerprint
 %{_datadir}/gdm/simple-greeter/extensions/fingerprint/page.ui
 %{_libdir}/gdm/simple-greeter/extensions/libfingerprint.so
 
 %changelog
+* Wed Aug 31 2011 Matthias Clasen <mclasen@redhat.com> - 3.1.90-1
+- Update to 3.1.90
+
 * Tue Aug 09 2011 Ray Strode <rstrode@redhat.com> 3.1.2-5
 - Lock down the pam config, so we don't run the greeter
   with unconfined/elevated privileges
