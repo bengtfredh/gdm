@@ -295,9 +295,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %dir %{_sysconfdir}/gdm/PreSession
 %dir %{_sysconfdir}/gdm/PostSession
 %dir %{_sysconfdir}/gdm/PostLogin
-%{_datadir}/gnome-session/sessions/gdm.session
 %{_datadir}/pixmaps/*.png
-%{_datadir}/icons/hicolor/*/apps/*.png
 %{_datadir}/glib-2.0/schemas/org.gnome.display-manager.extensions.fingerprint.gschema.xml
 %{_datadir}/glib-2.0/schemas/org.gnome.display-manager.extensions.smartcard.gschema.xml
 %{_datadir}/gdm/simple-greeter/extensions/unified/page.ui
@@ -334,15 +332,11 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %dir %{_localstatedir}/log/gdm
 %dir %{_localstatedir}/spool/gdm
 %attr(1770, gdm, gdm) %dir %{_localstatedir}/lib/gdm
-%attr(1750, gdm, gdm) %dir %{_localstatedir}/lib/gdm/.gconf.mandatory
-%attr(1640, gdm, gdm) %dir %{_localstatedir}/lib/gdm/.gconf.mandatory/*.xml
 %attr(1640, gdm, gdm) %dir %{_localstatedir}/lib/gdm/.gconf.path
 %attr(1755, gdm, gdm) %dir %{_localstatedir}/run/gdm/greeter
 %attr(1770, root, gdm) %dir %{_localstatedir}/gdm
 %attr(1777, root, gdm) %dir %{_localstatedir}/run/gdm
 %attr(1755, root, gdm) %dir %{_localstatedir}/cache/gdm
-%{_localstatedir}/lib/gdm/.local/share/applications/mime-dummy-handler.desktop
-%{_localstatedir}/lib/gdm/.local/share/applications/mimeapps.list
 %{_sysconfdir}/dconf/profile/gdm
 %{_sysconfdir}/dconf/db/gdm
 
