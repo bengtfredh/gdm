@@ -66,6 +66,7 @@ BuildRequires: gettext
 BuildRequires: gnome-doc-utils
 BuildRequires: libdmx-devel
 BuildRequires: audit-libs-devel >= %{libauditver}
+BuildRequires: gobject-introspection-devel
 BuildRequires: autoconf automake libtool
 BuildRequires: intltool
 %ifnarch s390 s390x ppc64
