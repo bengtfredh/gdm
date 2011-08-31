@@ -115,6 +115,11 @@ Group:     User Interface/Desktops
 Requires:  gdm = %{epoch}:%{version}-%{release}
 Requires:  fprintd-pam
 
+%package devel
+Summary:  Development files and headers for GDM
+Group:    Development/Libraries
+Requires: gdm = %{epoch}:%{version}-%{release}
+
 %description
 GDM provides the graphical login screen, shown shortly after boot up,
 log out, and when user-switching.
@@ -124,6 +129,9 @@ The GDM smartcard plugin provides functionality necessary to use a smart card wi
 
 %description plugin-fingerprint
 The GDM fingerprint plugin provides functionality necessary to use a fingerprint reader with GDM.
+
+%description devel
+Development files and headers for writing GDM greeters.
 
 %prep
 %setup -q
@@ -277,6 +285,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 
 %files -f gdm.lang
 %doc AUTHORS COPYING NEWS README TODO
+
 %dir %{_sysconfdir}/gdm
 %config(noreplace) %{_sysconfdir}/gdm/custom.conf
 %config %{_sysconfdir}/gdm/Init/*
@@ -313,10 +322,12 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_bindir}/gdm-screenshot
 %{_datadir}/gdm/*.ui
 %{_datadir}/gdm/locale.alias
+%{_datadir}/gnome-session/sessions/*
 %{_sysconfdir}/gconf/schemas/*.schemas
 %{_datadir}/gdm/gdb-cmd
 %{_libexecdir}/gdm-crash-logger
 %{_libdir}/libgdm*.so*
+%{_libdir}/girepository-1.0/GdmGreeter-1.0.typelib
 %dir %{_libdir}/gdm
 %dir %{_libdir}/gdm/simple-greeter
 %dir %{_libdir}/gdm/simple-greeter/extensions
@@ -329,9 +340,14 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %dir %{_datadir}/gdm/autostart
 %dir %{_datadir}/gdm/autostart/LoginWindow
 %{_datadir}/gdm/autostart/LoginWindow/*
+%dir %{_datadir}/gdm/greeter
+%dir %{_datadir}/gdm/greeter/applications
+%{_datadir}/gdm/greeter/applications/*
 %dir %{_localstatedir}/log/gdm
 %dir %{_localstatedir}/spool/gdm
 %attr(1770, gdm, gdm) %dir %{_localstatedir}/lib/gdm
+%attr(1750, gdm, gdm) %dir %{_localstatedir}/lib/gdm/.gconf.mandatory
+%attr(1640, gdm, gdm) %dir %{_localstatedir}/lib/gdm/.gconf.mandatory/*.xml
 %attr(1640, gdm, gdm) %dir %{_localstatedir}/lib/gdm/.gconf.path
 %attr(1755, gdm, gdm) %dir %{_localstatedir}/run/gdm/greeter
 %attr(1770, root, gdm) %dir %{_localstatedir}/gdm
@@ -339,6 +355,15 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %attr(1755, root, gdm) %dir %{_localstatedir}/cache/gdm
 %{_sysconfdir}/dconf/profile/gdm
 %{_sysconfdir}/dconf/db/gdm
+%{_datadir}/icons/hicolor/*/*/*.png
+
+%files devel
+%dir %{_includedir}/gdm
+%dir %{_includedir}/gdm/greeter
+%{_includedir}/gdm/greeter/gdm-greeter-client.h
+%{_includedir}/gdm/greeter/gdm-greeter-sessions.h
+%{_datadir}/gir-1.0/GdmGreeter-1.0.gir
+%{_libdir}/pkgconfig/gdmgreeter.pc
 
 %files plugin-smartcard
 %config %{_sysconfdir}/pam.d/gdm-smartcard
