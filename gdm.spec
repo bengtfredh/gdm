@@ -14,7 +14,7 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 3.1.90
+Version: 3.1.92
 Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
@@ -32,7 +32,7 @@ Source6: gdm-smartcard-16.png
 Source7: gdm-smartcard-48.png
 Source8: gdm-fingerprint-16.png
 Source9: gdm-fingerprint-48.png
-Source10: polkit-gnome-authentication-agent-1.desktop
+Source10: login-screen-logo.gschema.override
 
 Requires(pre): /usr/sbin/useradd
 
@@ -102,6 +102,24 @@ Requires: system-icon-theme
 # Fedora-specific
 Patch98: plymouth.patch
 Patch99: gdm-3.0.0-fedora-logo.patch
+
+%package libs
+Summary: Client-side library to talk to gdm
+Group: Development/Libraries
+Requires: %{name} = %{epoch}:%{version}-%{release}
+
+%description libs
+The gdm-libs package contains libraries that can
+be used for writing custom greeters.
+
+%package devel
+Summary: Development files for gdm-libs
+Group: Development/Libraries
+Requires: %{name}-libs = %{epoch}:%{version}-%{release}
+
+%description devel
+The gdm-devel package contains headers and other
+files needed to build custom greeters.
 
 %package plugin-smartcard
 Summary:   GDM smartcard plugin
@@ -177,6 +195,9 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/gdm/PostSession
 
 make install DESTDIR=$RPM_BUILD_ROOT
 
+# add logo to shell greeter
+cp $RPM_SOURCE_DIR/login-screen-logo.gschema.override $RPM_BUILD_ROOT%{_datadir}/glib-2.0/schemas
+
 # docs go elsewhere
 rm -rf $RPM_BUILD_ROOT/%{_prefix}/doc
 
@@ -194,9 +215,6 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/gtk-2.0/modules/*.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/gtk-2.0/modules/*.la
 
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow
-
-# temporarily manually copy this
-cp -f %{SOURCE10} $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/polkit-gnome-authentication-agent-1.desktop
 
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/gdm/greeter
 
@@ -280,8 +298,14 @@ if [ $1 -eq 0 ]; then
   gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 fi
 
+if [ $1 -eq 0 ] ; then
+    /usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
+fi
+
 %posttrans
 gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
+/usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
+dconf update || :
 
 %files -f gdm.lang
 %doc AUTHORS COPYING NEWS README TODO
@@ -304,9 +328,12 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %dir %{_sysconfdir}/gdm/PreSession
 %dir %{_sysconfdir}/gdm/PostSession
 %dir %{_sysconfdir}/gdm/PostLogin
+%{_datadir}/gnome-session/sessions/gdm-shell.session
+%{_datadir}/gnome-session/sessions/gdm-fallback.session
 %{_datadir}/pixmaps/*.png
-%{_datadir}/glib-2.0/schemas/org.gnome.display-manager.extensions.fingerprint.gschema.xml
-%{_datadir}/glib-2.0/schemas/org.gnome.display-manager.extensions.smartcard.gschema.xml
+%{_datadir}/icons/hicolor/*/apps/*.png
+%{_datadir}/glib-2.0/schemas/org.gnome.login-screen.gschema.xml
+%{_datadir}/glib-2.0/schemas/login-screen-logo.gschema.override
 %{_datadir}/gdm/simple-greeter/extensions/unified/page.ui
 %{_libexecdir}/gdm-factory-slave
 %{_libexecdir}/gdm-host-chooser
@@ -320,6 +347,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_sbindir}/gdm-binary
 %{_bindir}/gdmflexiserver
 %{_bindir}/gdm-screenshot
+%{_datadir}/gdm/greeter/applications/*
 %{_datadir}/gdm/*.ui
 %{_datadir}/gdm/locale.alias
 %{_datadir}/gnome-session/sessions/*
@@ -337,12 +365,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %dir %{_datadir}/gdm/simple-greeter/extensions/password
 %{_datadir}/gdm/simple-greeter/extensions/password/page.ui
 %dir %{_datadir}/gdm
-%dir %{_datadir}/gdm/autostart
-%dir %{_datadir}/gdm/autostart/LoginWindow
-%{_datadir}/gdm/autostart/LoginWindow/*
 %dir %{_datadir}/gdm/greeter
 %dir %{_datadir}/gdm/greeter/applications
-%{_datadir}/gdm/greeter/applications/*
 %dir %{_localstatedir}/log/gdm
 %dir %{_localstatedir}/spool/gdm
 %attr(1770, gdm, gdm) %dir %{_localstatedir}/lib/gdm
@@ -365,6 +389,15 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_datadir}/gir-1.0/GdmGreeter-1.0.gir
 %{_libdir}/pkgconfig/gdmgreeter.pc
 
+%files libs
+%{_libdir}/girepository-1.0/GdmGreeter-1.0.typelib
+
+%files devel
+%{_includedir}/gdm/greeter/gdm-greeter-client.h
+%{_includedir}/gdm/greeter/gdm-greeter-sessions.h
+%{_libdir}/pkgconfig/gdmgreeter.pc
+%{_datadir}/gir-1.0/GdmGreeter-1.0.gir
+
 %files plugin-smartcard
 %config %{_sysconfdir}/pam.d/gdm-smartcard
 %dir %{_datadir}/gdm/simple-greeter/extensions/smartcard
@@ -379,6 +412,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/gdm/simple-greeter/extensions/libfingerprint.so
 
 %changelog
+* Mon Sep 19 2011 Ray Strode <rstrode@redhat.com> 3.1.92-1
+- Update to 3.1.92
+
 * Wed Aug 31 2011 Matthias Clasen <mclasen@redhat.com> - 3.1.90-1
 - Update to 3.1.90
 
