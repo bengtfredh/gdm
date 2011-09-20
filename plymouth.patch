@@ -717,7 +717,8 @@ index 3175436..5c11b03 100644
 @@ -159,6 +160,7 @@ uninstall-hook:
 	$(DESTDIR)$(workingdir)/.config/dconf \
  	$(DESTDIR)$(screenshotdir) \
- 	$(DESTDIR)$(xauthdir)
+-	$(DESTDIR)$(xauthdir)
++	$(DESTDIR)$(xauthdir) \
 +	$(DESTDIR)$(spooldir)
  
 	-rmdir \
