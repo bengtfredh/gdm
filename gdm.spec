@@ -133,11 +133,6 @@ Group:     User Interface/Desktops
 Requires:  gdm = %{epoch}:%{version}-%{release}
 Requires:  fprintd-pam
 
-%package devel
-Summary:  Development files and headers for GDM
-Group:    Development/Libraries
-Requires: gdm = %{epoch}:%{version}-%{release}
-
 %description
 GDM provides the graphical login screen, shown shortly after boot up,
 log out, and when user-switching.
