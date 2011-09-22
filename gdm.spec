@@ -300,9 +300,6 @@ fi
 %posttrans
 gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 /usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
-touch --no-create %{_sysconfdir}/dconf/gdm.d/*
-touch --no-create %{_sysconfdir}/dconf/gdm.d/locks/*
-dconf update || :
 
 %files -f gdm.lang
 %doc AUTHORS COPYING NEWS README TODO
