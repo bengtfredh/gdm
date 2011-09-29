@@ -14,8 +14,8 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 3.1.92
-Release: 2%{?dist}
+Version: 3.2.0
+Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -406,6 +406,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/gdm/simple-greeter/extensions/libfingerprint.so
 
 %changelog
+* Wed Sep 28 2011 Ray <rstrode@redhat.com> - 1:3.2.0-1
+- Update to 3.2.0
+
 * Wed Sep 21 2011 Ray Strode <rstrode@redhat.com> 3.1.92-2
 - fix up dconf snippet so admin overrides get reintegrated
   on upgrade.
