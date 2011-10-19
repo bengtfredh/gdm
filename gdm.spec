@@ -14,14 +14,14 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 3.2.0
-Release: 2%{?dist}
+Version: 3.2.1
+Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
 URL: http://download.gnome.org/sources/gdm
 #VCS: git:git://git.gnome.org/gdm
-Source: http://download.gnome.org/sources/gdm/2.91/gdm-%{version}.tar.xz
+Source: http://download.gnome.org/sources/gdm/3.2/gdm-%{version}.tar.xz
 Source1: gdm-pam
 Source2: gdm-autologin-pam
 Source11: gdm-welcome-pam
@@ -32,7 +32,7 @@ Source6: gdm-smartcard-16.png
 Source7: gdm-smartcard-48.png
 Source8: gdm-fingerprint-16.png
 Source9: gdm-fingerprint-48.png
-Source10: login-screen-logo.gschema.override
+Source10: org.gnome.login-screen.gschema.override
 
 Requires(pre): /usr/sbin/useradd
 
@@ -84,12 +84,12 @@ BuildRequires: dbus-glib-devel
 BuildRequires: GConf2-devel
 BuildRequires: pkgconfig(accountsservice) >= 0.6.3
 
-# these are all just for rebuilding dconf-override-db
-BuildRequires: dbus-x11
-BuildRequires: dconf
-BuildRequires: gnome-power-manager
-BuildRequires: gsettings-desktop-schemas
-BuildRequires: gnome-settings-daemon
+# these are all just for rewriting gdm.d/00-upstream-settings
+Requires(posttrans): dbus-x11
+Requires(posttrans): dconf
+Requires(posttrans): gnome-power-manager
+Requires(posttrans): gsettings-desktop-schemas
+Requires(posttrans): gnome-settings-daemon
 
 Provides: service(graphical-login) = %{name}
 
@@ -99,9 +99,14 @@ Requires: audit-libs >= %{libauditver}
 # how well this will work with generic logos, though
 Requires: system-icon-theme
 
-# Upstream 64e6b10f98fe7226a2f41807268dae3afa80236d : check for
-# gnome-shell before using it to do login (RH #743596)
-Patch0: gdm-3.2.0-shell_check.patch
+# Swallow up old fingerprint/smartcard plugins
+Requires:  fprintd-pam
+
+Obsoletes: gdm-plugin-smartcard < 1:3.2.1
+Provides: gdm-plugin-smartcard = %{epoch}:%{version}-%{release}
+
+Obsoletes: gdm-plugin-fingerprint < 1:3.2.1
+Provides: gdm-plugin-fingerprint = %{epoch}:%{version}-%{release}
 
 # Fedora-specific
 Patch98: plymouth.patch
@@ -125,41 +130,19 @@ Requires: %{name}-libs = %{epoch}:%{version}-%{release}
 The gdm-devel package contains headers and other
 files needed to build custom greeters.
 
-%package plugin-smartcard
-Summary:   GDM smartcard plugin
-Group:     User Interface/Desktops
-Requires:  gdm = %{epoch}:%{version}-%{release}
-Requires:  pam_pkcs11
-
-%package plugin-fingerprint
-Summary:   GDM fingerprint plugin
-Group:     User Interface/Desktops
-Requires:  gdm = %{epoch}:%{version}-%{release}
-Requires:  fprintd-pam
-
 %description
 GDM provides the graphical login screen, shown shortly after boot up,
 log out, and when user-switching.
-
-%description plugin-smartcard
-The GDM smartcard plugin provides functionality necessary to use a smart card with GDM.
-
-%description plugin-fingerprint
-The GDM fingerprint plugin provides functionality necessary to use a fingerprint reader with GDM.
 
 %description devel
 Development files and headers for writing GDM greeters.
 
 %prep
 %setup -q
-%patch0 -p1 -b .shell-check
 %patch98 -p1 -b .plymouth
 %patch99 -p1 -b .fedora-logo
 
 autoreconf -i -f
-
-# force regeneration
-rm data/dconf-override-db
 
 %build
 cp -f %{SOURCE1} data/gdm
@@ -196,7 +179,10 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/gdm/PostSession
 make install DESTDIR=$RPM_BUILD_ROOT
 
 # add logo to shell greeter
-cp $RPM_SOURCE_DIR/login-screen-logo.gschema.override $RPM_BUILD_ROOT%{_datadir}/glib-2.0/schemas
+cp $RPM_SOURCE_DIR/org.gnome.login-screen.gschema.override $RPM_BUILD_ROOT%{_datadir}/glib-2.0/schemas
+
+# gets rebuilt in posttrans
+rm -f $RPM_BUILD_ROOT%{_sysconfdir}/dconf/db/gdm
 
 # docs go elsewhere
 rm -rf $RPM_BUILD_ROOT/%{_prefix}/doc
@@ -303,6 +289,7 @@ if [ $1 -eq 0 ] ; then
 fi
 
 %posttrans
+%{_libexecdir}/gdm-update-dconf-db gdm %{_datadir}/gdm/upstream-settings 00-upstream-settings
 gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 /usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 
@@ -332,7 +319,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_datadir}/pixmaps/*.png
 %{_datadir}/icons/hicolor/*/apps/*.png
 %{_datadir}/glib-2.0/schemas/org.gnome.login-screen.gschema.xml
-%{_datadir}/glib-2.0/schemas/login-screen-logo.gschema.override
+%{_datadir}/glib-2.0/schemas/org.gnome.login-screen.gschema.override
 %{_datadir}/gdm/simple-greeter/extensions/unified/page.ui
 %{_libexecdir}/gdm-factory-slave
 %{_libexecdir}/gdm-host-chooser
@@ -342,6 +329,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libexecdir}/gdm-simple-greeter
 %{_libexecdir}/gdm-simple-slave
 %{_libexecdir}/gdm-xdmcp-chooser-slave
+%{_libexecdir}/gdm-update-dconf-db
 %{_sbindir}/gdm
 %{_sbindir}/gdm-binary
 %{_bindir}/gdmflexiserver
@@ -376,9 +364,22 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %attr(1770, root, gdm) %dir %{_localstatedir}/gdm
 %attr(1777, root, gdm) %dir %{_localstatedir}/run/gdm
 %attr(1755, root, gdm) %dir %{_localstatedir}/cache/gdm
+%dir %{_sysconfdir}/dconf/db/gdm.d/locks
+%dir %{_sysconfdir}/dconf/db/gdm.d
+%{_sysconfdir}/dconf/db/gdm.d/00-upstream-settings
+%{_sysconfdir}/dconf/db/gdm.d/locks/00-upstream-settings-locks
 %{_sysconfdir}/dconf/profile/gdm
-%{_sysconfdir}/dconf/db/gdm
+%{_datadir}/gdm/upstream-settings
 %{_datadir}/icons/hicolor/*/*/*.png
+%config %{_sysconfdir}/pam.d/gdm-smartcard
+%dir %{_datadir}/gdm/simple-greeter/extensions/smartcard
+%{_datadir}/gdm/simple-greeter/extensions/smartcard/page.ui
+%{_libdir}/gdm/simple-greeter/extensions/libsmartcard.so
+%{_libexecdir}/gdm-smartcard-worker
+%config %{_sysconfdir}/pam.d/gdm-fingerprint
+%dir %{_datadir}/gdm/simple-greeter/extensions/fingerprint
+%{_datadir}/gdm/simple-greeter/extensions/fingerprint/page.ui
+%{_libdir}/gdm/simple-greeter/extensions/libfingerprint.so
 
 %files devel
 %dir %{_includedir}/gdm
@@ -397,20 +398,11 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/pkgconfig/gdmgreeter.pc
 %{_datadir}/gir-1.0/GdmGreeter-1.0.gir
 
-%files plugin-smartcard
-%config %{_sysconfdir}/pam.d/gdm-smartcard
-%dir %{_datadir}/gdm/simple-greeter/extensions/smartcard
-%{_datadir}/gdm/simple-greeter/extensions/smartcard/page.ui
-%{_libdir}/gdm/simple-greeter/extensions/libsmartcard.so
-%{_libexecdir}/gdm-smartcard-worker
-
-%files plugin-fingerprint
-%config %{_sysconfdir}/pam.d/gdm-fingerprint
-%dir %{_datadir}/gdm/simple-greeter/extensions/fingerprint
-%{_datadir}/gdm/simple-greeter/extensions/fingerprint/page.ui
-%{_libdir}/gdm/simple-greeter/extensions/libfingerprint.so
-
 %changelog
+* Tue Oct 18 2011 Ray Strode <rstrode@redhat.com> 3.2.1-1
+- Update to 3.2.1
+- Move plugins into main package
+
 * Wed Oct  5 2011 Adam Williamson <awilliam@redhat.com> - 1:3.2.0-2
 - shell_check.patch (upstream): re-add check for gnome-shell presence
   before using it to handle login (RH #743596)
