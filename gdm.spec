@@ -14,7 +14,7 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 3.2.1
+Version: 3.2.1.1
 Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
@@ -85,11 +85,7 @@ BuildRequires: GConf2-devel
 BuildRequires: pkgconfig(accountsservice) >= 0.6.3
 
 # these are all just for rewriting gdm.d/00-upstream-settings
-Requires(posttrans): dbus-x11
 Requires(posttrans): dconf
-Requires(posttrans): gnome-power-manager
-Requires(posttrans): gsettings-desktop-schemas
-Requires(posttrans): gnome-settings-daemon
 
 Provides: service(graphical-login) = %{name}
 
@@ -289,7 +285,7 @@ if [ $1 -eq 0 ] ; then
 fi
 
 %posttrans
-%{_libexecdir}/gdm-update-dconf-db gdm %{_datadir}/gdm/upstream-settings 00-upstream-settings
+dconf update
 gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 /usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 
@@ -329,7 +325,6 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libexecdir}/gdm-simple-greeter
 %{_libexecdir}/gdm-simple-slave
 %{_libexecdir}/gdm-xdmcp-chooser-slave
-%{_libexecdir}/gdm-update-dconf-db
 %{_sbindir}/gdm
 %{_sbindir}/gdm-binary
 %{_bindir}/gdmflexiserver
@@ -369,7 +364,6 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_sysconfdir}/dconf/db/gdm.d/00-upstream-settings
 %{_sysconfdir}/dconf/db/gdm.d/locks/00-upstream-settings-locks
 %{_sysconfdir}/dconf/profile/gdm
-%{_datadir}/gdm/upstream-settings
 %{_datadir}/icons/hicolor/*/*/*.png
 %config %{_sysconfdir}/pam.d/gdm-smartcard
 %dir %{_datadir}/gdm/simple-greeter/extensions/smartcard
@@ -399,6 +393,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_datadir}/gir-1.0/GdmGreeter-1.0.gir
 
 %changelog
+* Wed Oct 19 2011 Ray Strode <rstrode@redhat.com> 3.2.1.1-1
+- Update to 3.2.1.1
+
 * Tue Oct 18 2011 Ray Strode <rstrode@redhat.com> 3.2.1-1
 - Update to 3.2.1
 - Move plugins into main package
