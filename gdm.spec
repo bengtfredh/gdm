@@ -143,10 +143,10 @@ autoreconf -i -f
 %build
 cp -f %{SOURCE1} data/gdm
 cp -f %{SOURCE2} data/gdm-autologin
-cp -f %{SOURCE11} data/gdm-welcome
 cp -f %{SOURCE3} gui/simple-greeter/extensions/password/gdm-password.pam
-cp -f %{SOURCE4} gui/simple-greeter/extensions/smartcard/gdm-smartcard.pam
-cp -f %{SOURCE5} gui/simple-greeter/extensions/fingerprint/gdm-fingerprint.pam
+cp -f %{SOURCE4} data/gdm-smartcard.pam
+cp -f %{SOURCE5} data/gdm-fingerprint.pam
+cp -f %{SOURCE11} data/gdm-welcome
 cp -f %{SOURCE6} gui/simple-greeter/extensions/smartcard/icons/16x16/gdm-smartcard.png
 cp -f %{SOURCE7} gui/simple-greeter/extensions/smartcard/icons/48x48/gdm-smartcard.png
 cp -f %{SOURCE8} gui/simple-greeter/extensions/fingerprint/icons/16x16/gdm-fingerprint.png
