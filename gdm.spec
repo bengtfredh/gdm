@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.2.1.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -393,6 +393,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_datadir}/gir-1.0/GdmGreeter-1.0.gir
 
 %changelog
+* Mon Oct 24 2011 Ray Strode <rstrode@redhat.com> 3.2.1.1-2
+- Fix fingeprint login
+
 * Wed Oct 19 2011 Ray Strode <rstrode@redhat.com> 3.2.1.1-1
 - Update to 3.2.1.1
 
