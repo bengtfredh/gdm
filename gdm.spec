@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.2.1.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -104,6 +104,9 @@ Provides: gdm-plugin-smartcard = %{epoch}:%{version}-%{release}
 Obsoletes: gdm-plugin-fingerprint < 1:3.2.1
 Provides: gdm-plugin-fingerprint = %{epoch}:%{version}-%{release}
 
+# already upstream
+Patch0: auth-fixes.patch
+
 # Fedora-specific
 Patch98: plymouth.patch
 Patch99: gdm-3.0.0-fedora-logo.patch
@@ -135,6 +138,7 @@ Development files and headers for writing GDM greeters.
 
 %prep
 %setup -q
+%patch0 -p1 -b .auth-fixes
 %patch98 -p1 -b .plymouth
 %patch99 -p1 -b .fedora-logo
 
@@ -393,8 +397,13 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_datadir}/gir-1.0/GdmGreeter-1.0.gir
 
 %changelog
+* Mon Oct 24 2011 Ray Strode <rstrode@redhat.com> 3.2.1.1-3
+- Fix auth bug that could cause forced log outs shortly after log in
+  Resolves: #741431
+
 * Mon Oct 24 2011 Ray Strode <rstrode@redhat.com> 3.2.1.1-2
 - Fix fingeprint login
+  Resolves: #748549
 
 * Wed Oct 19 2011 Ray Strode <rstrode@redhat.com> 3.2.1.1-1
 - Update to 3.2.1.1
