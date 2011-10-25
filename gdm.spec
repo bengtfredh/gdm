@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.2.1.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -209,9 +209,6 @@ rm -rf $RPM_BUILD_ROOT%{_localstatedir}/scrollkeeper
 find $RPM_BUILD_ROOT -name '*.a' -delete
 find $RPM_BUILD_ROOT -name '*.la' -delete
 
-rm -f $RPM_BUILD_ROOT%{_includedir}/gdm/simple-greeter/gdm-login-extension.h
-rm -f $RPM_BUILD_ROOT%{_libdir}/pkgconfig/gdmsimplegreeter.pc
-
 %find_lang gdm --with-gnome
 
 %pre
@@ -386,17 +383,16 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_includedir}/gdm/greeter/gdm-greeter-sessions.h
 %{_datadir}/gir-1.0/GdmGreeter-1.0.gir
 %{_libdir}/pkgconfig/gdmgreeter.pc
+%{_includedir}/gdm/simple-greeter/gdm-login-extension.h
+%{_libdir}/pkgconfig/gdmsimplegreeter.pc
 
 %files libs
 %{_libdir}/girepository-1.0/GdmGreeter-1.0.typelib
 
-%files devel
-%{_includedir}/gdm/greeter/gdm-greeter-client.h
-%{_includedir}/gdm/greeter/gdm-greeter-sessions.h
-%{_libdir}/pkgconfig/gdmgreeter.pc
-%{_datadir}/gir-1.0/GdmGreeter-1.0.gir
-
 %changelog
+* Tue Oct 25 2011 Ray Strode <rstrode@redhat.com> 3.2.1.1-4
+- Put fallback plugin development files in -devel
+
 * Mon Oct 24 2011 Ray Strode <rstrode@redhat.com> 3.2.1.1-3
 - Fix auth bug that could cause forced log outs shortly after log in
   Resolves: #741431
