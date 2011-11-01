@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.2.1.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -53,6 +53,9 @@ Requires: gnome-keyring-pam
 Requires: pulseaudio-gdm-hooks
 # We need 1.0.4-5 since it lets us use "localhost" in auth cookies
 Requires: libXau >= 1.0.4-4
+# RH #746693: gdm's fallback session specifies metacity as the WM
+# and refuses to run if metacity is not present
+Requires: metacity
 BuildRequires: pkgconfig(libcanberra-gtk)
 BuildRequires: scrollkeeper >= 0:%{scrollkeeper_version}
 BuildRequires: pango-devel >= 0:%{pango_version}
@@ -390,6 +393,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/girepository-1.0/GdmGreeter-1.0.typelib
 
 %changelog
+* Tue Nov  1 2011 Adam Williamson <awilliam@redhat.com> - 1:3.2.1.1-6
+- requires metacity for fallback session (RH #746693)
+
 * Wed Oct 26 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:3.2.1.1-5
 - Rebuilt for glibc bug#747377
 
