@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.2.1.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -391,6 +391,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/girepository-1.0/GdmGreeter-1.0.typelib
 
 %changelog
+* Fri Nov 04 2011 Bill Nottingham <notting@redhat.com> - 3.2.1.1-8
+- fix logo in fallback mode
+
 * Thu Nov 03 2011 Ray Strode <rstrode@redhat.com> 3.2.1.1-7
 - Drop fprintd-pam dependency
   This makes Harald's laptop more lean and streamlined.
