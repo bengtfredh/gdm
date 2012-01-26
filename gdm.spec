@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.2.1.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -93,10 +93,6 @@ Requires(posttrans): dconf
 Provides: service(graphical-login) = %{name}
 
 Requires: audit-libs >= %{libauditver}
-
-# For the Fedora logo in the greeter, not sure
-# how well this will work with generic logos, though
-Requires: system-icon-theme
 
 # Swallow up old fingerprint/smartcard plugins
 Obsoletes: gdm-plugin-smartcard < 1:3.2.1
@@ -391,6 +387,10 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/girepository-1.0/GdmGreeter-1.0.typelib
 
 %changelog
+* Thu Jan 26 2012 Ray Strode <rstrode@redhat.com> 3.2.1.1-9
+- Drop system-icon-theme requirement
+  We don't depend on it anymore.
+
 * Fri Nov 04 2011 Bill Nottingham <notting@redhat.com> - 3.2.1.1-8
 - fix logo in fallback mode
 
