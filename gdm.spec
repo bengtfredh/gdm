@@ -14,7 +14,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.2.1.1
-Release: 13%{?dist}
+Release: 14%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -392,6 +392,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/girepository-1.0/GdmGreeter-1.0.typelib
 
 %changelog
+* Wed Feb 15 2012 Ray Strode <rstrode@redhat.com> 3.2.1.1-14
+- More consolekit registration fixes
+
 * Mon Feb 13 2012 Ray Strode <rstrode@redhat.com> 3.2.1.1-12
 - Restore ConsoleKit registration if ConsoleKit is installed
 
