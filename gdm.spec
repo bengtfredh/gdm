@@ -14,7 +14,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.4.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -100,6 +100,7 @@ Provides: gdm-plugin-smartcard = %{epoch}:%{version}-%{release}
 Obsoletes: gdm-plugin-fingerprint < 1:3.2.1
 Provides: gdm-plugin-fingerprint = %{epoch}:%{version}-%{release}
 
+Patch0: fix-pam-close-session.patch
 # Fedora-specific
 Patch98: plymouth.patch
 
@@ -131,6 +132,7 @@ Development files and headers for writing GDM greeters.
 %prep
 %setup -q
 
+%patch0 -p1 -b .fix-pam-close-session
 %patch98 -p1 -b .plymouth
 
 autoreconf -i -f
@@ -375,6 +377,10 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/girepository-1.0/GdmGreeter-1.0.typelib
 
 %changelog
+* Sat May 05 2012 Ray Strode <rstrode@redhat.com> 3.4.1-2
+- Fix pam close session
+  Related: #814690
+
 * Sat Apr 14 2012 Matthias Clasen <mclasen@redhat.com> - 3.4.1-1
 - Update to 3.4.1
 

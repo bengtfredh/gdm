@@ -1,0 +1,89 @@
+From 09358813114e1c16b1ea02d80327e418a1809486 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Sat, 5 May 2012 23:58:35 -0400
+Subject: [PATCH] worker: don't report session gone until closed
+
+It's important we don't tell the slave the session
+has exited/died until we've called pam_close_session,
+since the slave reacts to it going way by closing
+down which can result in the worker getting explicitly
+killed before pam_close_session gets called.
+---
+ daemon/gdm-session-worker.c |   20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/daemon/gdm-session-worker.c b/daemon/gdm-session-worker.c
+index 869075b..449e7d1 100644
+--- a/daemon/gdm-session-worker.c
++++ b/daemon/gdm-session-worker.c
+@@ -1639,6 +1639,16 @@ session_worker_child_watch (GPid              pid,
+                  : WIFSIGNALED (status) ? WTERMSIG (status)
+                  : -1);
+ 
++#ifdef WITH_CONSOLE_KIT
++        if (worker->priv->ckc != NULL) {
++                ck_connector_close_session (worker->priv->ckc, NULL);
++                ck_connector_unref (worker->priv->ckc);
++                worker->priv->ckc = NULL;
++        }
++#endif
++
++        gdm_session_worker_uninitialize_pam (worker, PAM_SUCCESS);
++
+         if (WIFEXITED (status)) {
+                 int code = WEXITSTATUS (status);
+ 
+@@ -1653,16 +1663,6 @@ session_worker_child_watch (GPid              pid,
+                                       num);
+         }
+ 
+-#ifdef WITH_CONSOLE_KIT
+-        if (worker->priv->ckc != NULL) {
+-                ck_connector_close_session (worker->priv->ckc, NULL);
+-                ck_connector_unref (worker->priv->ckc);
+-                worker->priv->ckc = NULL;
+-        }
+-#endif
+-
+-        gdm_session_worker_uninitialize_pam (worker, PAM_SUCCESS);
+-
+         worker->priv->child_pid = -1;
+ }
+ 
+-- 
+1.7.10
+
+From fe89c906e5a8d6d5e9140226866d315e97d3bee3 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Sat, 5 May 2012 22:49:54 -0400
+Subject: [PATCH] daemon: don't freak out if greeter dies after login finishes
+
+If we've already logged a user in and the greeter is shutting
+down and crashes, we should just ignore the crash and continue
+with the login process.
+
+Furthermore, if we explicitly kill the greeter and it dies with
+a TERM signal, then we definitely don't want to treat that as
+if it was a crash.
+---
+ daemon/gdm-simple-slave.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/daemon/gdm-simple-slave.c b/daemon/gdm-simple-slave.c
+index 7c709a6..bf48246 100644
+--- a/daemon/gdm-simple-slave.c
++++ b/daemon/gdm-simple-slave.c
+@@ -1032,7 +1032,9 @@ on_greeter_session_died (GdmGreeterSession    *greeter,
+                          GdmSimpleSlave       *slave)
+ {
+         g_debug ("GdmSimpleSlave: Greeter died: %d", signal);
+-        gdm_slave_stopped (GDM_SLAVE (slave));
++        if (slave->priv->start_session_service_name == NULL) {
++                gdm_slave_stopped (GDM_SLAVE (slave));
++        }
+ }
+ 
+ static void
+-- 
+1.7.10
+
