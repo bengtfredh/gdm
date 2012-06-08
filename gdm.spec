@@ -15,7 +15,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.2.1.1
-Release: 9%{?dist}
+Release: 10%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -103,6 +103,7 @@ Provides: gdm-plugin-fingerprint = %{epoch}:%{version}-%{release}
 
 # already upstream
 Patch0: auth-fixes.patch
+Patch1: be-less-noisy.patch
 
 # Fedora-specific
 Patch98: plymouth.patch
@@ -136,6 +137,7 @@ Development files and headers for writing GDM greeters.
 %prep
 %setup -q
 %patch0 -p1 -b .auth-fixes
+%patch1 -p1 -b .be-less-noisy
 %patch98 -p1 -b .plymouth
 %patch99 -p1 -b .fedora-logo
 
@@ -387,6 +389,11 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/girepository-1.0/GdmGreeter-1.0.typelib
 
 %changelog
+* Fri Jun 08 2012 Ray Strode <rstrode@redhat.com> 3.2.1.1-10
+- Don't fill syslog with gnome-session spew
+  Resolves: #759737
+  Resolves: #755135
+
 * Thu Jan 26 2012 Ray Strode <rstrode@redhat.com> 3.2.1.1-9
 - Drop system-icon-theme requirement
   We don't depend on it anymore.
