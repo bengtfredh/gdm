@@ -9,7 +9,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.6.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -91,6 +91,8 @@ Provides: gdm-plugin-smartcard = %{epoch}:%{version}-%{release}
 Obsoletes: gdm-plugin-fingerprint < 1:3.2.1
 Provides: gdm-plugin-fingerprint = %{epoch}:%{version}-%{release}
 
+Patch0: usefamilywild.patch
+
 %package libs
 Summary: Client-side library to talk to gdm
 Group: Development/Libraries
@@ -118,6 +120,7 @@ Development files and headers for writing GDM greeters.
 
 %prep
 %setup -q
+%patch0 -p1 -b .usefamilywild
 
 autoreconf -i -f
 intltoolize -f
@@ -346,6 +349,10 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/girepository-1.0/Gdm-1.0.typelib
 
 %changelog
+* Mon Dec 10 2012 Ray Strode <rstrode@redhat.com> 3.6.2-3
+- Make Xauthority file more hostname change resistant.
+  Related: #885217
+
 * Tue Nov 20 2012 Matthias Clasen <mclasen@redhat.com> - 1:3.6.2-2
 - Remove patch fuzz of 999
 
