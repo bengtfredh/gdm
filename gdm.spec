@@ -9,7 +9,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.6.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -351,6 +351,12 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/girepository-1.0/Gdm-1.0.typelib
 
 %changelog
+* Thu Dec 20 2012 Ray Strode <rstrode@redhat.com> 3.6.2-5
+- Revise xauth patch from -3 to include FamilyLocal entry
+  for backward compatibility
+  Resolves: #887816
+  Related: #885217
+
 * Mon Dec 17 2012 Ray Strode <rstrode@redhat.com> 3.6.2-4
 - Make normal login after autologin work
   Resolves: #881896
