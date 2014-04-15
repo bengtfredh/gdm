@@ -21,26 +21,6 @@ URL: http://download.gnome.org/sources/gdm
 Source: http://download.gnome.org/sources/gdm/3.12/gdm-%{version}.tar.xz
 Source1: org.gnome.login-screen.gschema.override
 
-Requires(pre): /usr/sbin/useradd
-
-Requires: pam >= 0:%{pam_version}
-Requires: /sbin/nologin
-Requires: system-logos
-Requires: xorg-x11-server-utils
-Requires: setxkbmap
-Requires: xorg-x11-xinit
-Requires: systemd >= 186
-Requires: accountsservice
-Requires: gnome-settings-daemon >= 2.21.92
-Requires: gnome-icon-theme-symbolic
-Requires: iso-codes
-Requires: gnome-session
-Requires: gnome-shell
-# since we use it, and pam spams the log if the module is missing
-Requires: gnome-keyring-pam
-Requires: pulseaudio-gdm-hooks
-# We need 1.0.4-5 since it lets us use "localhost" in auth cookies
-Requires: libXau >= 1.0.4-4
 BuildRequires: pkgconfig(libcanberra-gtk)
 BuildRequires: pango-devel >= 0:%{pango_version}
 BuildRequires: gtk3-devel >= 0:%{gtk3_version}
@@ -72,17 +52,38 @@ BuildRequires: pkgconfig(libsystemd-login)
 BuildRequires: pkgconfig(libsystemd-daemon)
 BuildRequires: pkgconfig(ply-boot-client)
 BuildRequires: systemd
+BuildRequires: dconf
 
+Requires(pre):    /usr/sbin/useradd
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
 
-# these are all just for rewriting gdm.d/00-upstream-settings
-Requires(posttrans): dconf
-
 Provides: service(graphical-login) = %{name}
 
+Requires: accountsservice
 Requires: audit-libs >= %{libauditver}
+Requires: dconf
+Requires: gnome-icon-theme-symbolic
+# since we use it, and pam spams the log if the module is missing
+Requires: gnome-keyring-pam
+Requires: gnome-session
+Requires: gnome-settings-daemon >= 2.21.92
+Requires: gnome-shell
+Requires: iso-codes
+# We need 1.0.4-5 since it lets us use "localhost" in auth cookies
+Requires: libXau >= 1.0.4-4
+Requires: pam >= 0:%{pam_version}
+Requires: pulseaudio-gdm-hooks
+Requires: /sbin/nologin
+Requires: setxkbmap
+Requires: systemd >= 186
+Requires: system-logos
+Requires: xorg-x11-server-utils
+Requires: xorg-x11-xinit
+
+Obsoletes: gdm-libs < 1:3.12.0-3
+Provides: gdm-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
 # Swallow up old fingerprint/smartcard plugins
 Obsoletes: gdm-plugin-smartcard < 1:3.2.1
@@ -91,19 +92,10 @@ Provides: gdm-plugin-smartcard = %{epoch}:%{version}-%{release}
 Obsoletes: gdm-plugin-fingerprint < 1:3.2.1
 Provides: gdm-plugin-fingerprint = %{epoch}:%{version}-%{release}
 
-%package libs
-Summary: Client-side library to talk to gdm
-Group: Development/Libraries
-Requires: %{name} = %{epoch}:%{version}-%{release}
-
-%description libs
-The gdm-libs package contains libraries that can
-be used for writing custom greeters.
-
 %package devel
-Summary: Development files for gdm-libs
+Summary: Development files for gdm
 Group: Development/Libraries
-Requires: %{name}-libs = %{epoch}:%{version}-%{release}
+Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description devel
 The gdm-devel package contains headers and other
@@ -149,10 +141,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/gdm
 
 # add logo to shell greeter
-cp $RPM_SOURCE_DIR/org.gnome.login-screen.gschema.override $RPM_BUILD_ROOT%{_datadir}/glib-2.0/schemas
-
-# gets rebuilt in posttrans
-rm -f $RPM_BUILD_ROOT%{_sysconfdir}/dconf/db/gdm
+cp %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/glib-2.0/schemas
 
 # docs go elsewhere
 rm -rf $RPM_BUILD_ROOT/%{_prefix}/doc
@@ -257,12 +246,11 @@ fi
 %systemd_postun
 
 %posttrans
-dconf update
 gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 /usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 
 %files -f gdm.lang
-%doc AUTHORS COPYING NEWS README TODO
+%doc AUTHORS COPYING NEWS README
 
 %dir %{_sysconfdir}/gdm
 %config(noreplace) %{_sysconfdir}/gdm/custom.conf
@@ -287,25 +275,21 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libexecdir}/gdm-host-chooser
 %{_libexecdir}/gdm-session-worker
 %{_libexecdir}/gdm-simple-chooser
-%{_libexecdir}/gdm-simple-slave
-%{_libexecdir}/gdm-xdmcp-chooser-slave
 %{_sbindir}/gdm
 %{_bindir}/gdmflexiserver
 %{_bindir}/gdm-screenshot
+%{_datadir}/dconf/profile/gdm
 %{_datadir}/gdm/greeter/applications/*
 %{_datadir}/gdm/greeter/autostart/*
+%{_datadir}/gdm/greeter-dconf-defaults
 %{_datadir}/gdm/locale.alias
 %{_datadir}/gdm/gdb-cmd
+%{_libdir}/girepository-1.0/Gdm-1.0.typelib
 %{_libdir}/libgdm*.so*
 %dir %{_localstatedir}/log/gdm
 %attr(1770, gdm, gdm) %dir %{_localstatedir}/lib/gdm
 %attr(0711, root, gdm) %dir /run/gdm
 %attr(1755, root, gdm) %dir %{_localstatedir}/cache/gdm
-%dir %{_sysconfdir}/dconf/db/gdm.d/locks
-%dir %{_sysconfdir}/dconf/db/gdm.d
-%{_sysconfdir}/dconf/db/gdm.d/00-upstream-settings
-%{_sysconfdir}/dconf/db/gdm.d/locks/00-upstream-settings-locks
-%{_sysconfdir}/dconf/profile/gdm
 %{_datadir}/icons/hicolor/*/*/*.png
 %config %{_sysconfdir}/pam.d/gdm-pin
 %config %{_sysconfdir}/pam.d/gdm-smartcard
@@ -318,9 +302,6 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_includedir}/gdm/*.h
 %{_datadir}/gir-1.0/Gdm-1.0.gir
 %{_libdir}/pkgconfig/gdm.pc
-
-%files libs
-%{_libdir}/girepository-1.0/Gdm-1.0.typelib
 
 %changelog
 * Mon Apr 14 2014 Richard Hughes <rhughes@redhat.com> - 1:3.12.0-1
