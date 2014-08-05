@@ -12,7 +12,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.12.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -20,6 +20,8 @@ URL: http://download.gnome.org/sources/gdm
 #VCS: git:git://git.gnome.org/gdm
 Source: http://download.gnome.org/sources/gdm/3.12/gdm-%{version}.tar.xz
 Source1: org.gnome.login-screen.gschema.override
+# https://bugzilla.gnome.org/show_bug.cgi?id=733485
+Patch0: 0001-daemon-Fix-crash-when-typing-password-at-screen-lock.patch
 
 BuildRequires: pkgconfig(libcanberra-gtk)
 BuildRequires: pango-devel >= 0:%{pango_version}
@@ -46,7 +48,6 @@ BuildRequires: libxklavier-devel >= 4.0
 BuildRequires: upower-devel >= 0.9.7
 BuildRequires: libXdmcp-devel
 BuildRequires: dbus-glib-devel
-BuildRequires: GConf2-devel
 BuildRequires: pkgconfig(accountsservice) >= 0.6.3
 BuildRequires: pkgconfig(libsystemd-login)
 BuildRequires: pkgconfig(libsystemd-daemon)
@@ -109,6 +110,8 @@ Development files and headers for writing GDM greeters.
 
 %prep
 %setup -q
+
+%patch0 -p1
 
 autoreconf -i -f
 intltoolize -f
@@ -303,6 +306,10 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/pkgconfig/gdm.pc
 
 %changelog
+* Tue Aug 05 2014 Bastien Nocera <bnocera@redhat.com> 3.12.2-4
+- Add patch to prevent crash after screen lock
+- Remove unused GConf2-devel BuildRequires
+
 * Tue Jul 22 2014 Kalev Lember <kalevlember@gmail.com> - 1:3.12.2-3
 - Rebuilt for gobject-introspection 1.41.4
 
