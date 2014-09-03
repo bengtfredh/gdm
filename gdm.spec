@@ -12,7 +12,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.13.91
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -228,7 +228,6 @@ fi
 %systemd_post gdm.service
 
 %preun
-%gconf_schema_remove gdm-simple-greeter
 %systemd_preun gdm.service
 
 %postun
@@ -302,6 +301,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/pkgconfig/gdm.pc
 
 %changelog
+* Wed Sep 03 2014 Kalev Lember <kalevlember@gmail.com> - 1:3.13.91-2
+- Drop last GConf remnants
+
 * Wed Sep 03 2014 Kalev Lember <kalevlember@gmail.com> - 1:3.13.91-1
 - Update to 3.13.91
 
