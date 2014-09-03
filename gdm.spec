@@ -11,17 +11,15 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 3.12.2
-Release: 5%{?dist}
+Version: 3.13.91
+Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
 URL: http://download.gnome.org/sources/gdm
 #VCS: git:git://git.gnome.org/gdm
-Source: http://download.gnome.org/sources/gdm/3.12/gdm-%{version}.tar.xz
+Source: http://download.gnome.org/sources/gdm/3.13/gdm-%{version}.tar.xz
 Source1: org.gnome.login-screen.gschema.override
-# https://bugzilla.gnome.org/show_bug.cgi?id=733485
-Patch0: 0001-daemon-Fix-crash-when-typing-password-at-screen-lock.patch
 
 BuildRequires: pkgconfig(libcanberra-gtk)
 BuildRequires: pango-devel >= 0:%{pango_version}
@@ -110,8 +108,6 @@ Development files and headers for writing GDM greeters.
 
 %prep
 %setup -q
-
-%patch0 -p1
 
 autoreconf -i -f
 intltoolize -f
@@ -306,6 +302,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/pkgconfig/gdm.pc
 
 %changelog
+* Wed Sep 03 2014 Kalev Lember <kalevlember@gmail.com> - 1:3.13.91-1
+- Update to 3.13.91
+
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:3.12.2-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
