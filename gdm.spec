@@ -11,8 +11,8 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 3.14.1
-Release: 3%{?dist}
+Version: 3.14.2
+Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -298,6 +298,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/pkgconfig/gdm.pc
 
 %changelog
+* Sat Apr 11 2015 Kalev Lember <kalevlember@gmail.com> - 1:3.14.2-1
+- Update to 3.14.2
+
 * Fri Jan 23 2015 Ray Strode <rstrode@redhat.com> 3.14.1-3
 - Fix user switching
   Resolves: #1184933
