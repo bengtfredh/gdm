@@ -10,8 +10,8 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 3.16.1.1
-Release: 2%{?dist}
+Version: 3.16.2
+Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -19,7 +19,6 @@ URL: https://wiki.gnome.org/Projects/GDM
 #VCS: git:git://git.gnome.org/gdm
 Source: http://download.gnome.org/sources/gdm/3.16/gdm-%{version}.tar.xz
 Source1: org.gnome.login-screen.gschema.override
-Patch1: gdm-env-d.patch
 
 BuildRequires: pam-devel >= 0:%{pam_version}
 BuildRequires: fontconfig >= 0:%{fontconfig_version}
@@ -105,7 +104,6 @@ files needed to build custom greeters.
 
 %prep
 %setup -q
-%patch1  -p1 -b .env_d
 
 autoreconf -i -f
 intltoolize -f
@@ -300,6 +298,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/pkgconfig/gdm.pc
 
 %changelog
+* Thu Jul 02 2015 Kalev Lember <klember@redhat.com> - 1:3.16.2-1
+- Update to 3.16.2
+
 * Tue Jun 23 2015 Alexander Larsson <alexl@redhat.com> - 1:3.16.1.1-2
 - Add env.d patch
 
