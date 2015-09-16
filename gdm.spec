@@ -10,7 +10,7 @@
 
 Summary: The GNOME Display Manager
 Name: gdm
-Version: 3.16.2
+Version: 3.16.3
 Release: 1%{?dist}
 Epoch: 1
 License: GPLv2+
@@ -298,6 +298,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/pkgconfig/gdm.pc
 
 %changelog
+* Wed Sep 16 2015 Kalev Lember <klember@redhat.com> - 1:3.16.3-1
+- Update to 3.16.3
+
 * Thu Jul 02 2015 Kalev Lember <klember@redhat.com> - 1:3.16.2-1
 - Update to 3.16.2
 
