@@ -1,0 +1,303 @@
+From 83c0105b2972ff68b50a24101755b5e72a11872b Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Tue, 20 Oct 2015 16:48:17 -0400
+Subject: [PATCH 1/3] gdm-session: emit verification-complete even for logins
+
+Right now we only emit verification-complete when the a user
+successfully reauthenticates.  We should also do it when they
+successfully initially authenticate.
+
+This commit fixes that.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=754814
+---
+ daemon/gdm-session.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/daemon/gdm-session.c b/daemon/gdm-session.c
+index 6faa7cd..0fedb7b 100644
+--- a/daemon/gdm-session.c
++++ b/daemon/gdm-session.c
+@@ -280,73 +280,72 @@ on_authorize_cb (GdmDBusWorker *proxy,
+ 
+         if (worked) {
+                 gdm_session_accredit (self, service_name);
+         } else {
+                 report_and_stop_conversation (self, service_name, error);
+         }
+ }
+ 
+ static void
+ on_establish_credentials_cb (GdmDBusWorker *proxy,
+                              GAsyncResult  *res,
+                              gpointer       user_data)
+ {
+         GdmSessionConversation *conversation = user_data;
+         GdmSession *self;
+         char *service_name;
+ 
+         GError *error = NULL;
+         gboolean worked;
+ 
+         worked = gdm_dbus_worker_call_establish_credentials_finish (proxy, res, &error);
+ 
+         if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CLOSED) ||
+             g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                 return;
+ 
+         self = conversation->session;
+         service_name = conversation->service_name;
+ 
+         if (worked) {
+-                switch (self->priv->verification_mode) {
+-                case GDM_SESSION_VERIFICATION_MODE_REAUTHENTICATE:
+-                        if (self->priv->user_verifier_interface != NULL) {
+-                                gdm_dbus_user_verifier_emit_verification_complete (self->priv->user_verifier_interface,
+-                                                                                   service_name);
+-                                g_signal_emit (self, signals[VERIFICATION_COMPLETE], 0, service_name);
+-                        }
+-                        break;
++                if (self->priv->user_verifier_interface != NULL) {
++                        gdm_dbus_user_verifier_emit_verification_complete (self->priv->user_verifier_interface,
++                                                                           service_name);
++                        g_signal_emit (self, signals[VERIFICATION_COMPLETE], 0, service_name);
++                }
+ 
++                switch (self->priv->verification_mode) {
+                 case GDM_SESSION_VERIFICATION_MODE_LOGIN:
+                 case GDM_SESSION_VERIFICATION_MODE_CHOOSER:
+                         gdm_session_open_session (self, service_name);
+                         break;
++                case GDM_SESSION_VERIFICATION_MODE_REAUTHENTICATE:
+                 default:
+                         break;
+                 }
+         } else {
+                 report_and_stop_conversation (self, service_name, error);
+         }
+ }
+ 
+ static const char **
+ get_system_session_dirs (void)
+ {
+         static const char *search_dirs[] = {
+                 "/etc/X11/sessions/",
+                 DMCONFDIR "/Sessions/",
+                 DATADIR "/gdm/BuiltInSessions/",
+                 DATADIR "/xsessions/",
+ #ifdef ENABLE_WAYLAND_SUPPORT
+                 DATADIR "/wayland-sessions/",
+ #endif
+                 NULL
+         };
+ 
+         return search_dirs;
+ }
+ 
+ static gboolean
+ is_prog_in_path (const char *prog)
+ {
+         char    *f;
+         gboolean ret;
+-- 
+2.7.0
+
+
+From 34a302282a323820f83e76978cd0a07b2ee0304b Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Fri, 22 Jan 2016 15:59:00 -0500
+Subject: [PATCH 2/3] session: keep session object alive while establishing
+ credentials
+
+The only reference to session objects gets cleaned up when
+verification-complete is emitted, which happens in the middle
+of the establish_credentials handler.
+
+This commit makes sure the session object stays alive until the
+handler completes to prevent a crash.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=754814
+---
+ daemon/gdm-session.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/daemon/gdm-session.c b/daemon/gdm-session.c
+index 0fedb7b..dbd4ba6 100644
+--- a/daemon/gdm-session.c
++++ b/daemon/gdm-session.c
+@@ -276,82 +276,85 @@ on_authorize_cb (GdmDBusWorker *proxy,
+                 return;
+ 
+         self = conversation->session;
+         service_name = conversation->service_name;
+ 
+         if (worked) {
+                 gdm_session_accredit (self, service_name);
+         } else {
+                 report_and_stop_conversation (self, service_name, error);
+         }
+ }
+ 
+ static void
+ on_establish_credentials_cb (GdmDBusWorker *proxy,
+                              GAsyncResult  *res,
+                              gpointer       user_data)
+ {
+         GdmSessionConversation *conversation = user_data;
+         GdmSession *self;
+         char *service_name;
+ 
+         GError *error = NULL;
+         gboolean worked;
+ 
+         worked = gdm_dbus_worker_call_establish_credentials_finish (proxy, res, &error);
+ 
+         if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CLOSED) ||
+             g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                 return;
+ 
+-        self = conversation->session;
+-        service_name = conversation->service_name;
++        self = g_object_ref (conversation->session);
++        service_name = g_strdup (conversation->service_name);
+ 
+         if (worked) {
+                 if (self->priv->user_verifier_interface != NULL) {
+                         gdm_dbus_user_verifier_emit_verification_complete (self->priv->user_verifier_interface,
+                                                                            service_name);
+                         g_signal_emit (self, signals[VERIFICATION_COMPLETE], 0, service_name);
+                 }
+ 
+                 switch (self->priv->verification_mode) {
+                 case GDM_SESSION_VERIFICATION_MODE_LOGIN:
+                 case GDM_SESSION_VERIFICATION_MODE_CHOOSER:
+                         gdm_session_open_session (self, service_name);
+                         break;
+                 case GDM_SESSION_VERIFICATION_MODE_REAUTHENTICATE:
+                 default:
+                         break;
+                 }
+         } else {
+                 report_and_stop_conversation (self, service_name, error);
+         }
++
++        g_free (service_name);
++        g_object_unref (self);
+ }
+ 
+ static const char **
+ get_system_session_dirs (void)
+ {
+         static const char *search_dirs[] = {
+                 "/etc/X11/sessions/",
+                 DMCONFDIR "/Sessions/",
+                 DATADIR "/gdm/BuiltInSessions/",
+                 DATADIR "/xsessions/",
+ #ifdef ENABLE_WAYLAND_SUPPORT
+                 DATADIR "/wayland-sessions/",
+ #endif
+                 NULL
+         };
+ 
+         return search_dirs;
+ }
+ 
+ static gboolean
+ is_prog_in_path (const char *prog)
+ {
+         char    *f;
+         gboolean ret;
+ 
+         f = g_find_program_in_path (prog);
+         ret = (f != NULL);
+         g_free (f);
+         return ret;
+ }
+-- 
+2.7.0
+
+
+From 48e264a2e3fbb5854125fc03a9ea3822abb68b94 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Fri, 22 Jan 2016 16:01:20 -0500
+Subject: [PATCH 3/3] session: free conversation hash when disposing session
+
+We're currently leaking the hash table when disposing the
+session, this commit fixes that.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=754814
+---
+ daemon/gdm-session.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/daemon/gdm-session.c b/daemon/gdm-session.c
+index dbd4ba6..09e6a48 100644
+--- a/daemon/gdm-session.c
++++ b/daemon/gdm-session.c
+@@ -3296,60 +3296,63 @@ gdm_session_get_property (GObject    *object,
+                 break;
+         case PROP_DISPLAY_IS_INITIAL:
+                 g_value_set_boolean (value, self->priv->display_is_initial);
+                 break;
+         case PROP_VERIFICATION_MODE:
+                 g_value_set_enum (value, self->priv->verification_mode);
+                 break;
+         case PROP_ALLOWED_USER:
+                 g_value_set_uint (value, self->priv->allowed_user);
+                 break;
+         case PROP_CONVERSATION_ENVIRONMENT:
+                 g_value_set_pointer (value, self->priv->environment);
+                 break;
+         default:
+                 G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+                 break;
+         }
+ }
+ 
+ static void
+ gdm_session_dispose (GObject *object)
+ {
+         GdmSession *self;
+ 
+         self = GDM_SESSION (object);
+ 
+         g_debug ("GdmSession: Disposing session");
+ 
+         gdm_session_close (self);
+ 
++        g_clear_pointer (&self->priv->conversations,
++                         g_hash_table_unref);
++
+         g_clear_object (&self->priv->user_verifier_interface);
+         g_clear_object (&self->priv->greeter_interface);
+         g_clear_object (&self->priv->chooser_interface);
+ 
+         g_free (self->priv->display_name);
+         self->priv->display_name = NULL;
+ 
+         g_free (self->priv->display_hostname);
+         self->priv->display_hostname = NULL;
+ 
+         g_free (self->priv->display_device);
+         self->priv->display_device = NULL;
+ 
+         g_free (self->priv->display_seat_id);
+         self->priv->display_seat_id = NULL;
+ 
+         g_free (self->priv->display_x11_authority_file);
+         self->priv->display_x11_authority_file = NULL;
+ 
+         g_strfreev (self->priv->conversation_environment);
+         self->priv->conversation_environment = NULL;
+ 
+         if (self->priv->worker_server != NULL) {
+                 g_dbus_server_stop (self->priv->worker_server);
+                 g_clear_object (&self->priv->worker_server);
+         }
+ 
+         if (self->priv->outside_server != NULL) {
+                 g_dbus_server_stop (self->priv->outside_server);
+                 g_clear_object (&self->priv->outside_server);
+-- 
+2.7.0
+
