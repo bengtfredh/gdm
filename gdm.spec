@@ -10,7 +10,7 @@
 Summary: The GNOME Display Manager
 Name: gdm
 Version: 3.20.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 License: GPLv2+
 Group: User Interface/X
@@ -48,6 +48,8 @@ BuildRequires: pkgconfig(xau)
 BuildRequires: libXdmcp-devel
 BuildRequires: systemd
 BuildRequires: dconf
+# Check if Xorg is new enough to require '-listen tcp' (1.17)
+BuildRequires: xorg-x11-server-devel >= 1.17
 
 Requires(pre):    /usr/sbin/useradd
 Requires(post):   systemd
@@ -295,6 +297,10 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/pkgconfig/gdm.pc
 
 %changelog
+* Mon Jun 27 2016 Ray Strode <rstrode@redhat.com> - 1:3.20.1-2
+- Add buildrequires on Xorg so GDM knows to use -listen
+  Resolves: #1226084
+
 * Thu Apr 21 2016 Kalev Lember <klember@redhat.com> - 1:3.20.1-1
 - Update to 3.20.1
 
