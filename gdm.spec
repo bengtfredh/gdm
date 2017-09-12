@@ -9,7 +9,7 @@
 
 Name: gdm
 Epoch: 1
-Version: 3.24.2
+Version: 3.24.3
 Release: 1%{?dist}
 Summary: The GNOME Display Manager
 
@@ -296,6 +296,11 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
 %{_libdir}/pkgconfig/gdm.pc
 
 %changelog
+* Tue Sep 12 2017 Ray Strode <rstrode@redhat.com> - 1:3.24.3-1
+- Update to 3.24.3
+- Fix for unauthenticated unlock when autologin is enabled (CVE-2017-12164)
+  Resolves: #1484033
+
 * Wed May 10 2017 Kalev Lember <klember@redhat.com> - 1:3.24.2-1
 - Update to 3.24.2
 
