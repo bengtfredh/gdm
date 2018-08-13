@@ -9,7 +9,7 @@
 
 Name: gdm
 Epoch: 1
-Version: 3.28.2
+Version: 3.28.3
 Release: 1%{?dist}
 Summary: The GNOME Display Manager
 
@@ -316,6 +316,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Mon Aug 13 2018 Kalev Lember <klember@redhat.com> - 1:3.28.3-1
+- Update to 3.28.3 (CVE-2018-14424)
+
 * Thu May 17 2018 Kalev Lember <klember@redhat.com> - 1:3.28.2-1
 - Update to 3.28.2
 
