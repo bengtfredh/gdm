@@ -10,7 +10,7 @@
 Name: gdm
 Epoch: 1
 Version: 3.30.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -321,6 +321,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Fri Sep 07 2018 Kalev Lember <klember@redhat.com> - 1:3.30.0-3
+- Rebuilt against fixed atk (#1626575)
+
 * Fri Sep 07 2018 Ray Strode <rstrode@redhat.com> - 3.30.0-2
 - More initial setup fixes
   Resolves: #1625572
