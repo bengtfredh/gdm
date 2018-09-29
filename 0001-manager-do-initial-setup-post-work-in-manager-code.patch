@@ -1,4 +1,4 @@
-From 692613bc996f5ab090a1fb605ae8dd50c6bb81bf Mon Sep 17 00:00:00 2001
+From 03cd095d78fed6632e32ed933d71b8819d86afab Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Thu, 6 Sep 2018 19:31:50 -0400
 Subject: [PATCH] manager: do initial-setup post work in manager code
@@ -18,7 +18,7 @@ This commit moves the code to a more logical place.
  2 files changed, 132 insertions(+), 132 deletions(-)
 
 diff --git a/daemon/gdm-display.c b/daemon/gdm-display.c
-index 5e193f2f5..511a5ca3f 100644
+index 878be88da..c036a0a5c 100644
 --- a/daemon/gdm-display.c
 +++ b/daemon/gdm-display.c
 @@ -22,61 +22,60 @@
@@ -215,7 +215,7 @@ index 5e193f2f5..511a5ca3f 100644
  const char *
  gdm_display_get_session_id (GdmDisplay *self)
  {
-@@ -1631,145 +1559,85 @@ gdm_display_start_greeter_session (GdmDisplay *self)
+@@ -1660,145 +1588,85 @@ gdm_display_start_greeter_session (GdmDisplay *self)
                                   G_CALLBACK (on_launch_environment_session_stopped),
                                   self, 0);
          g_signal_connect_object (self->priv->launch_environment,
@@ -362,7 +362,7 @@ index 5e193f2f5..511a5ca3f 100644
          xcb_intern_atom_cookie_t atom_cookie;
          xcb_intern_atom_reply_t *atom_reply = NULL;
 diff --git a/daemon/gdm-manager.c b/daemon/gdm-manager.c
-index 20a9ba7d7..c37135f44 100644
+index b1e9b68be..7a0832977 100644
 --- a/daemon/gdm-manager.c
 +++ b/daemon/gdm-manager.c
 @@ -35,60 +35,61 @@
@@ -413,6 +413,7 @@ index 20a9ba7d7..c37135f44 100644
  #ifdef HAVE_LIBXDMCP
          GdmXdmcpDisplayFactory *xdmcp_factory;
  #endif
+         GdmDisplay             *automatic_login_display;
          GList                  *user_sessions;
          GHashTable             *transient_sessions;
          GHashTable             *open_reauthentication_requests;
@@ -426,8 +427,7 @@ index 20a9ba7d7..c37135f44 100644
  
  #ifdef  WITH_PLYMOUTH
          guint                     plymouth_is_running : 1;
- #endif
-@@ -1552,130 +1553,261 @@ start_user_session (GdmManager *manager,
+@@ -1568,130 +1569,261 @@ start_user_session (GdmManager *manager,
  
          destroy_start_user_session_operation (operation);
  }
@@ -671,24 +671,24 @@ index 20a9ba7d7..c37135f44 100644
                  g_object_set_data (G_OBJECT (operation->session), "gdm-display", NULL);
                  create_user_session_for_display (operation->manager, display, allowed_uid);
  
+                 /* Give the user session a new display object for bookkeeping purposes */
+                 create_display_for_user_session (operation->manager,
+                                                  operation->session,
+                                                  session_id);
+ 
+ 
                  if (g_strcmp0 (operation->service_name, "gdm-autologin") == 0) {
                          /* remove the unused prepared greeter display since we're not going
                           * to have a greeter */
                          gdm_display_store_remove (self->priv->display_store, display);
                          g_object_unref (display);
-                 }
  
-                 /* Give the user session a new display object for bookkeeping purposes */
-                 create_display_for_user_session (operation->manager,
-                                                  operation->session,
-                                                  session_id);
+ 			self->priv->automatic_login_display = g_object_get_data (G_OBJECT (operation->session), "gdm-display");
+ 			g_object_add_weak_pointer (G_OBJECT (display), (gpointer *) &self->priv->automatic_login_display);
+                 }
          }
  
          start_user_session (operation->manager, operation);
- 
-  out:
-         return G_SOURCE_REMOVE;
- }
 -- 
-2.17.1
+2.19.0
 

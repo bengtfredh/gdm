@@ -9,8 +9,8 @@
 
 Name: gdm
 Epoch: 1
-Version: 3.30.0
-Release: 3%{?dist}
+Version: 3.30.1
+Release: 1%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -175,10 +175,6 @@ mkdir -p %{buildroot}/run/gdm
 find %{buildroot} -name '*.a' -delete
 find %{buildroot} -name '*.la' -delete
 
-mkdir -p ${RPM_BUILD_ROOT}%{_udevrulesdir}
-mv ${RPM_BUILD_ROOT}/lib/udev/rules.d/* ${RPM_BUILD_ROOT}%{_udevrulesdir}
-rm -rf ${RPM_BUILD_ROOT}/lib/udev
-
 %find_lang gdm --with-gnome
 
 %pre
@@ -321,6 +317,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Sat Sep 29 2018 Kalev Lember <klember@redhat.com> - 1:3.30.1-1
+- Update to 3.30.1
+
 * Fri Sep 07 2018 Kalev Lember <klember@redhat.com> - 1:3.30.0-3
 - Rebuilt against fixed atk (#1626575)
 
