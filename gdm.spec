@@ -185,8 +185,6 @@ find %{buildroot} -name '*.la' -delete
 exit 0
 
 %post
-%{?ldconfig}
-
 # if the user already has a config file, then migrate it to the new
 # location; rpm will ensure that old file will be renamed
 
@@ -240,7 +238,6 @@ fi
 %systemd_preun gdm.service
 
 %postun
-%{?ldconfig}
 %systemd_postun gdm.service
 
 %files -f gdm.lang
