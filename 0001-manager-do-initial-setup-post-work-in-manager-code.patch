@@ -1,4 +1,4 @@
-From 03cd095d78fed6632e32ed933d71b8819d86afab Mon Sep 17 00:00:00 2001
+From 1984b36ba08506ea65dcb95e565f7d24ecbd1703 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Thu, 6 Sep 2018 19:31:50 -0400
 Subject: [PATCH] manager: do initial-setup post work in manager code
@@ -18,7 +18,7 @@ This commit moves the code to a more logical place.
  2 files changed, 132 insertions(+), 132 deletions(-)
 
 diff --git a/daemon/gdm-display.c b/daemon/gdm-display.c
-index 878be88da..c036a0a5c 100644
+index 5e193f2f5..511a5ca3f 100644
 --- a/daemon/gdm-display.c
 +++ b/daemon/gdm-display.c
 @@ -22,61 +22,60 @@
@@ -215,7 +215,7 @@ index 878be88da..c036a0a5c 100644
  const char *
  gdm_display_get_session_id (GdmDisplay *self)
  {
-@@ -1660,145 +1588,85 @@ gdm_display_start_greeter_session (GdmDisplay *self)
+@@ -1631,145 +1559,85 @@ gdm_display_start_greeter_session (GdmDisplay *self)
                                   G_CALLBACK (on_launch_environment_session_stopped),
                                   self, 0);
          g_signal_connect_object (self->priv->launch_environment,
@@ -362,7 +362,7 @@ index 878be88da..c036a0a5c 100644
          xcb_intern_atom_cookie_t atom_cookie;
          xcb_intern_atom_reply_t *atom_reply = NULL;
 diff --git a/daemon/gdm-manager.c b/daemon/gdm-manager.c
-index b1e9b68be..7a0832977 100644
+index 62a967389..4d2ad9dec 100644
 --- a/daemon/gdm-manager.c
 +++ b/daemon/gdm-manager.c
 @@ -35,60 +35,61 @@
@@ -683,12 +683,12 @@ index b1e9b68be..7a0832977 100644
                          gdm_display_store_remove (self->priv->display_store, display);
                          g_object_unref (display);
  
- 			self->priv->automatic_login_display = g_object_get_data (G_OBJECT (operation->session), "gdm-display");
- 			g_object_add_weak_pointer (G_OBJECT (display), (gpointer *) &self->priv->automatic_login_display);
+                         self->priv->automatic_login_display = g_object_get_data (G_OBJECT (operation->session), "gdm-display");
+                         g_object_add_weak_pointer (G_OBJECT (self->priv->automatic_login_display), (gpointer *) &self->priv->automatic_login_display);
                  }
          }
  
          start_user_session (operation->manager, operation);
 -- 
-2.19.0
+2.17.1
 
