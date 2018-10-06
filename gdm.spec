@@ -10,7 +10,7 @@
 Name: gdm
 Epoch: 1
 Version: 3.30.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -19,7 +19,11 @@ Source0: http://download.gnome.org/sources/gdm/3.29/gdm-%{version}.tar.xz
 Source1: org.gnome.login-screen.gschema.override
 Patch0: 0001-Honor-initial-setup-being-disabled-by-distro-install.patch
 
-Patch11: 0001-manager-do-initial-setup-post-work-in-manager-code.patch
+Patch11: 0001-manager-correct-display-confusion.patch
+
+Patch21: 0001-local-display-factory-defer-initialization-for-CanGr.patch
+
+Patch31: 0001-manager-do-initial-setup-post-work-in-manager-code.patch
 
 Patch99: system-dconf.patch
 
@@ -314,6 +318,10 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Sat Oct 06 2018 Ray Strode <rstrode@redhat.com> - 1:3.30.1-2
+- Fix login screen for machines that boot to fast
+- Fix autologin crash
+
 * Sat Sep 29 2018 Kalev Lember <klember@redhat.com> - 1:3.30.1-1
 - Update to 3.30.1
 

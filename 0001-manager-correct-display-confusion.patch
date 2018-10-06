@@ -1,0 +1,87 @@
+From a3904bf5f9e6fe6bc3bb2ad9c856cf1361b8194d Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Mon, 1 Oct 2018 11:05:57 -0400
+Subject: [PATCH] manager: correct display confusion
+
+commit c5c5bf1f reworked autologin and broke it.
+
+This commit addresses the breakage by accessing
+the proper display variable.
+
+Closes https://gitlab.gnome.org/GNOME/gdm/issues/426
+---
+ daemon/gdm-manager.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/daemon/gdm-manager.c b/daemon/gdm-manager.c
+index b1e9b68be..62a967389 100644
+--- a/daemon/gdm-manager.c
++++ b/daemon/gdm-manager.c
+@@ -1662,62 +1662,62 @@ on_start_user_session (StartUserSessionOperation *operation)
+                         if (gdm_display_get_status (display) == GDM_DISPLAY_MANAGED) {
+                                 g_debug ("GdmManager: closing down initial setup display");
+                                 gdm_display_stop_greeter_session (display);
+                                 gdm_display_unmanage (display);
+                                 gdm_display_finish (display);
+                         }
+                 } else {
+                         g_debug ("GdmManager: session has its display server, reusing our server for another login screen");
+                 }
+ 
+                 /* The user session is going to follow the session worker
+                  * into the new display. Untie it from this display and
+                  * create a new session for a future user login. */
+                 allowed_uid = gdm_session_get_allowed_user (operation->session);
+                 g_object_set_data (G_OBJECT (display), "gdm-user-session", NULL);
+                 g_object_set_data (G_OBJECT (operation->session), "gdm-display", NULL);
+                 create_user_session_for_display (operation->manager, display, allowed_uid);
+ 
+                 /* Give the user session a new display object for bookkeeping purposes */
+                 create_display_for_user_session (operation->manager,
+                                                  operation->session,
+                                                  session_id);
+ 
+ 
+                 if (g_strcmp0 (operation->service_name, "gdm-autologin") == 0) {
+                         /* remove the unused prepared greeter display since we're not going
+                          * to have a greeter */
+                         gdm_display_store_remove (self->priv->display_store, display);
+                         g_object_unref (display);
+ 
+-			self->priv->automatic_login_display = g_object_get_data (G_OBJECT (operation->session), "gdm-display");
+-			g_object_add_weak_pointer (G_OBJECT (display), (gpointer *) &self->priv->automatic_login_display);
++                        self->priv->automatic_login_display = g_object_get_data (G_OBJECT (operation->session), "gdm-display");
++                        g_object_add_weak_pointer (G_OBJECT (self->priv->automatic_login_display), (gpointer *) &self->priv->automatic_login_display);
+                 }
+         }
+ 
+         start_user_session (operation->manager, operation);
+ 
+  out:
+         return G_SOURCE_REMOVE;
+ }
+ 
+ static void
+ queue_start_user_session (GdmManager *manager,
+                           GdmSession *session,
+                           const char *service_name)
+ {
+         StartUserSessionOperation *operation;
+ 
+         operation = g_slice_new0 (StartUserSessionOperation);
+         operation->manager = manager;
+         operation->session = g_object_ref (session);
+         operation->service_name = g_strdup (service_name);
+ 
+         operation->idle_id = g_idle_add ((GSourceFunc) on_start_user_session, operation);
+         g_object_set_data (G_OBJECT (session), "start-user-session-operation", operation);
+ }
+ 
+ static void
+ start_user_session_if_ready (GdmManager *manager,
+                              GdmSession *session,
+                              const char *service_name)
+ {
+-- 
+2.17.1
+
