@@ -115,7 +115,6 @@ files needed to build custom greeters.
 
 %package pam-extensions-devel
 Summary: Macros for developing GDM extensions to PAM
-Group: Development/Libraries
 Requires: pam-devel
 
 %description pam-extensions-devel
