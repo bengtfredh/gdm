@@ -1,7 +1,7 @@
-From 757e620a8dd26902215a332af71cfcdf08574803 Mon Sep 17 00:00:00 2001
+From 3c6de5c4673fd678e5aec8c8377c12e563287a84 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Thu, 4 Oct 2018 10:40:41 -0400
-Subject: [PATCH] local-display-factory: defer initialization for
+Subject: [PATCH 1/2] local-display-factory: defer initialization for
  CanGraphical=no seats
 
 During startup a seat may not be ready for a display server yet.
@@ -11,11 +11,11 @@ CanGraphical capable, before trying to put a login screen on it.
 
 Closes https://gitlab.gnome.org/bugzilla-migration/gdm/issues/103
 ---
- daemon/gdm-local-display-factory.c | 132 +++++++++++++++++++++++++++--
- 1 file changed, 126 insertions(+), 6 deletions(-)
+ daemon/gdm-local-display-factory.c | 131 +++++++++++++++++++++++++++--
+ 1 file changed, 125 insertions(+), 6 deletions(-)
 
 diff --git a/daemon/gdm-local-display-factory.c b/daemon/gdm-local-display-factory.c
-index 891c25375..5430085ea 100644
+index 98daca484..a6849f995 100644
 --- a/daemon/gdm-local-display-factory.c
 +++ b/daemon/gdm-local-display-factory.c
 @@ -29,92 +29,98 @@
@@ -35,8 +35,6 @@ index 891c25375..5430085ea 100644
  #include "gdm-local-display.h"
  #include "gdm-legacy-display.h"
  
- #define GDM_LOCAL_DISPLAY_FACTORY_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GDM_TYPE_LOCAL_DISPLAY_FACTORY, GdmLocalDisplayFactoryPrivate))
- 
  #define GDM_DBUS_PATH                       "/org/gnome/DisplayManager"
  #define GDM_LOCAL_DISPLAY_FACTORY_DBUS_PATH GDM_DBUS_PATH "/LocalDisplayFactory"
  #define GDM_MANAGER_DBUS_NAME               "org.gnome.DisplayManager.LocalDisplayFactory"
@@ -44,8 +42,10 @@ index 891c25375..5430085ea 100644
  #define MAX_DISPLAY_FAILURES 5
  #define WAIT_TO_FINISH_TIMEOUT 10 /* seconds */
  
- struct GdmLocalDisplayFactoryPrivate
+ struct _GdmLocalDisplayFactory
  {
+         GdmDisplayFactory              parent;
+ 
          GdmDBusLocalDisplayFactory *skeleton;
          GDBusConnection *connection;
          GHashTable      *used_display_numbers;
@@ -117,7 +117,7 @@ index 891c25375..5430085ea 100644
  sort_nums (gpointer a,
             gpointer b)
  {
-@@ -409,60 +415,61 @@ lookup_by_seat_id (const char *id,
+@@ -407,60 +413,61 @@ lookup_by_seat_id (const char *id,
          return res;
  }
  
@@ -175,11 +175,11 @@ index 891c25375..5430085ea 100644
                          g_object_set (G_OBJECT (display), "status", GDM_DISPLAY_MANAGED, NULL);
                          g_debug ("GdmLocalDisplayFactory: session %s found, activating.",
                                   login_session_id);
-                         gdm_activate_session_by_id (factory->priv->connection, seat_id, login_session_id);
+                         gdm_activate_session_by_id (factory->connection, seat_id, login_session_id);
                          return NULL;
                  }
          }
-@@ -493,131 +500,236 @@ create_display (GdmLocalDisplayFactory *factory,
+@@ -491,131 +498,236 @@ create_display (GdmLocalDisplayFactory *factory,
  
          /* let store own the ref */
          g_object_unref (display);
@@ -214,7 +214,7 @@ index 891c25375..5430085ea 100644
 +        const char *seat, *path;
  
          g_debug ("GdmLocalDisplayFactory: enumerating seats from logind");
-         result = g_dbus_connection_call_sync (factory->priv->connection,
+         result = g_dbus_connection_call_sync (factory->connection,
                                                "org.freedesktop.login1",
                                                "/org/freedesktop/login1",
                                                "org.freedesktop.login1.Manager",
@@ -317,7 +317,7 @@ index 891c25375..5430085ea 100644
 +        g_debug ("GdmLocalDisplayFactory: creating seat proxy for seat '%s' with path '%s'",
 +                 seat, path);
 +
-+        proxy = g_dbus_proxy_new_sync (self->priv->connection,
++        proxy = g_dbus_proxy_new_sync (self->connection,
 +                                       G_DBUS_PROXY_FLAGS_NONE,
 +                                       NULL,
 +                                       "org.freedesktop.login1",
@@ -332,8 +332,8 @@ index 891c25375..5430085ea 100644
 +                return FALSE;
 +        }
 +
-+        g_hash_table_insert (self->priv->seat_proxies, g_strdup (seat), g_object_ref (proxy));
-+        g_object_set_data_full (G_OBJECT (proxy), "seat-id", g_strdup (seat), (GDestroyNotify) g_free);
++        g_hash_table_insert (self->seat_proxies, g_strdup (seat), g_object_ref (proxy));
++    g_object_set_data_full (G_OBJECT (proxy), "seat-id", g_strdup (seat), (GDestroyNotify) g_free);
 +        g_signal_connect_object (G_OBJECT (proxy),
 +                                 "g-properties-changed",
 +                                 G_CALLBACK (on_seat_proxy_properties_changed),
@@ -390,7 +390,7 @@ index 891c25375..5430085ea 100644
 +
 +        g_debug ("GdmLocalDisplayFactory: seat '%s' no longer available", seat);
 +
-+        g_hash_table_remove (factory->priv->seat_proxies, (gpointer) seat);
++        g_hash_table_remove (factory->seat_proxies, (gpointer) seat);
 +        delete_display (factory, seat);
  }
  
@@ -411,7 +411,7 @@ index 891c25375..5430085ea 100644
  wait_to_finish_timeout (GdmLocalDisplayFactory *factory)
  {
          finish_waiting_displays_on_seat (factory, "seat0");
-         factory->priv->wait_to_finish_timeout_id = 0;
+         factory->wait_to_finish_timeout_id = 0;
          return G_SOURCE_REMOVE;
  }
  
@@ -422,7 +422,7 @@ index 891c25375..5430085ea 100644
          g_autofree char *display_session_type = NULL;
          gboolean doing_initial_setup = FALSE;
  
-@@ -737,60 +849,65 @@ on_vt_changed (GIOChannel    *source,
+@@ -735,60 +847,65 @@ on_vt_changed (GIOChannel    *source,
  
                          g_debug ("GdmLocalDisplayFactory: tty of login window is %s", tty_of_login_window_vt);
                          if (g_strcmp0 (tty_of_login_window_vt, tty_of_previous_vt) == 0) {
@@ -448,7 +448,7 @@ index 891c25375..5430085ea 100644
           * on it (unless a login screen is already running elsewhere, then
           * jump to that login screen)
           */
-         if (strcmp (factory->priv->tty_of_active_vt, tty_of_initial_vt) != 0) {
+         if (strcmp (factory->tty_of_active_vt, tty_of_initial_vt) != 0) {
                  g_debug ("GdmLocalDisplayFactory: active VT is not initial VT, so ignoring");
                  return G_SOURCE_CONTINUE;
          }
@@ -474,7 +474,7 @@ index 891c25375..5430085ea 100644
  {
          g_autoptr (GIOChannel) io_channel = NULL;
  
-         factory->priv->seat_new_id = g_dbus_connection_signal_subscribe (factory->priv->connection,
+         factory->seat_new_id = g_dbus_connection_signal_subscribe (factory->connection,
                                                                           "org.freedesktop.login1",
                                                                           "org.freedesktop.login1.Manager",
                                                                           "SeatNew",
@@ -484,11 +484,15 @@ index 891c25375..5430085ea 100644
                                                                           on_seat_new,
                                                                           g_object_ref (factory),
                                                                           g_object_unref);
-         factory->priv->seat_removed_id = g_dbus_connection_signal_subscribe (factory->priv->connection,
+         factory->seat_removed_id = g_dbus_connection_signal_subscribe (factory->connection,
                                                                               "org.freedesktop.login1",
                                                                               "org.freedesktop.login1.Manager",
                                                                               "SeatRemoved",
-@@ -1014,69 +1131,72 @@ gdm_local_display_factory_constructor (GType                  type,
+@@ -1008,69 +1125,71 @@ gdm_local_display_factory_constructor (GType                  type,
+                                                                                                                    n_construct_properties,
+                                                                                                                    construct_properties));
+ 
+         res = register_factory (factory);
          if (! res) {
                  g_warning ("Unable to register local display factory with system bus");
          }
@@ -509,17 +513,13 @@ index 891c25375..5430085ea 100644
  
          factory_class->start = gdm_local_display_factory_start;
          factory_class->stop = gdm_local_display_factory_stop;
- 
-         g_type_class_add_private (klass, sizeof (GdmLocalDisplayFactoryPrivate));
  }
  
  static void
  gdm_local_display_factory_init (GdmLocalDisplayFactory *factory)
  {
-         factory->priv = GDM_LOCAL_DISPLAY_FACTORY_GET_PRIVATE (factory);
- 
-         factory->priv->used_display_numbers = g_hash_table_new (NULL, NULL);
-+        factory->priv->seat_proxies = g_hash_table_new_full (NULL, NULL, g_free, g_object_unref);
+         factory->used_display_numbers = g_hash_table_new (NULL, NULL);
++        factory->seat_proxies = g_hash_table_new_full (NULL, NULL, g_free, g_object_unref);
  }
  
  static void
@@ -532,14 +532,13 @@ index 891c25375..5430085ea 100644
  
          factory = GDM_LOCAL_DISPLAY_FACTORY (object);
  
-         g_return_if_fail (factory->priv != NULL);
+         g_return_if_fail (factory != NULL);
  
-+        g_hash_table_destroy (factory->priv->seat_proxies);
-+
-         g_clear_object (&factory->priv->connection);
-         g_clear_object (&factory->priv->skeleton);
++        g_hash_table_destroy (factory->seat_proxies);
+         g_clear_object (&factory->connection);
+         g_clear_object (&factory->skeleton);
  
-         g_hash_table_destroy (factory->priv->used_display_numbers);
+         g_hash_table_destroy (factory->used_display_numbers);
  
          gdm_local_display_factory_stop_monitor (factory);
  
