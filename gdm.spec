@@ -10,7 +10,7 @@
 Name: gdm
 Epoch: 1
 Version: 3.32.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -18,6 +18,8 @@ URL: https://wiki.gnome.org/Projects/GDM
 Source0: http://download.gnome.org/sources/gdm/3.30/gdm-%{version}.tar.xz
 Source1: org.gnome.login-screen.gschema.override
 Patch0: 0001-Honor-initial-setup-being-disabled-by-distro-install.patch
+
+Patch10001: 0001-data-disable-wayland-if-modesetting-is-disabled.patch
 
 Patch99: system-dconf.patch
 
@@ -311,6 +313,10 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Mon Apr 15 2019 Ray Strode <rstrode@redhat.com> - 1:3.32.0-3
+- avoid wayland if nomodeset is on kernel command line
+  Related: #1691909
+
 * Mon Apr 15 2019 Ray Strode <rstrode@redhat.com> - 1:3.32.0-2
 - Drop CanGraphical patch for now.  It's causing problems.
   Resolves: #1683197
