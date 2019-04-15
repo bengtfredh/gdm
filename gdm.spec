@@ -10,7 +10,7 @@
 Name: gdm
 Epoch: 1
 Version: 3.32.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -18,8 +18,6 @@ URL: https://wiki.gnome.org/Projects/GDM
 Source0: http://download.gnome.org/sources/gdm/3.30/gdm-%{version}.tar.xz
 Source1: org.gnome.login-screen.gschema.override
 Patch0: 0001-Honor-initial-setup-being-disabled-by-distro-install.patch
-
-Patch21: 0001-local-display-factory-defer-initialization-for-CanGr.patch
 
 Patch99: system-dconf.patch
 
@@ -313,6 +311,10 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Mon Apr 15 2019 Ray Strode <rstrode@redhat.com> - 1:3.32.0-2
+- Drop CanGraphical patch for now.  It's causing problems.
+  Resolves: #1683197
+
 * Wed Mar 13 2019 Kalev Lember <klember@redhat.com> - 1:3.32.0-1
 - Update to 3.32.0
 
