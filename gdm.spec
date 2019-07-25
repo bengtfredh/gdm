@@ -10,7 +10,7 @@
 Name: gdm
 Epoch: 1
 Version: 3.32.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -313,6 +313,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.32.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
 * Mon Apr 15 2019 Ray Strode <rstrode@redhat.com> - 1:3.32.0-3
 - avoid wayland if nomodeset is on kernel command line
   Related: #1691909
