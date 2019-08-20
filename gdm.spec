@@ -9,7 +9,7 @@
 
 Name: gdm
 Epoch: 1
-Version: 3.33.4
+Version: 3.33.90
 Release: 1%{?dist}
 Summary: The GNOME Display Manager
 
@@ -258,7 +258,6 @@ fi
 %dir %{_sysconfdir}/gdm/PreSession
 %dir %{_sysconfdir}/gdm/PostSession
 %dir %{_sysconfdir}/gdm/PostLogin
-%{_datadir}/pixmaps/*.png
 %{_datadir}/glib-2.0/schemas/org.gnome.login-screen.gschema.xml
 %{_datadir}/glib-2.0/schemas/org.gnome.login-screen.gschema.override
 %{_libexecdir}/gdm-disable-wayland
@@ -292,7 +291,6 @@ fi
 %attr(0600, gdm, gdm) %{_localstatedir}/lib/gdm/.config/pulse/default.pa
 %attr(0711, root, gdm) %dir /run/gdm
 %attr(1755, root, gdm) %dir %{_localstatedir}/cache/gdm
-%{_datadir}/icons/hicolor/*/*/*.png
 %config %{_sysconfdir}/pam.d/gdm-pin
 %config %{_sysconfdir}/pam.d/gdm-smartcard
 %config %{_sysconfdir}/pam.d/gdm-fingerprint
@@ -313,6 +311,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Tue Aug 20 2019 Kalev Lember <klember@redhat.com> - 1:3.33.90-1
+- Update to 3.33.90
+
 * Mon Aug 12 2019 Kalev Lember <klember@redhat.com> - 1:3.33.4-1
 - Update to 3.33.4
 
