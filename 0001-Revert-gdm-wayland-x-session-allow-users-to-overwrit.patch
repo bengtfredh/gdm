@@ -1,0 +1,43 @@
+From 499d9f74f5f512944c5ce7f48151eb8520764769 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Thu, 22 Aug 2019 13:21:44 -0700
+Subject: [PATCH] Revert "gdm-{wayland,x}-session: allow users to overwrite
+ environment"
+
+This reverts commit 2802e92d27450d86d81b6356dd532ec80e797223,
+as it causes regular users' $PATH to have /usr/sbin before
+/usr/bin, which breaks consolehelper.
+---
+ daemon/gdm-wayland-session.c | 2 +-
+ daemon/gdm-x-session.c       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/daemon/gdm-wayland-session.c b/daemon/gdm-wayland-session.c
+index 79922664..35679b19 100644
+--- a/daemon/gdm-wayland-session.c
++++ b/daemon/gdm-wayland-session.c
+@@ -320,7 +320,7 @@ spawn_session (State        *state,
+                                 continue;
+                         }
+ 
+-                        g_subprocess_launcher_setenv (launcher, environment_entry[0], environment_entry[1], TRUE);
++                        g_subprocess_launcher_setenv (launcher, environment_entry[0], environment_entry[1], FALSE);
+                 }
+ 
+                 /* Don't allow session specific environment variables from earlier sessions to
+diff --git a/daemon/gdm-x-session.c b/daemon/gdm-x-session.c
+index 9714da3e..58865a6c 100644
+--- a/daemon/gdm-x-session.c
++++ b/daemon/gdm-x-session.c
+@@ -635,7 +635,7 @@ spawn_session (State        *state,
+                                 continue;
+                         }
+ 
+-                        g_subprocess_launcher_setenv (launcher, environment_entry[0], environment_entry[1], TRUE);
++                        g_subprocess_launcher_setenv (launcher, environment_entry[0], environment_entry[1], FALSE);
+                 }
+ 
+                 /* Don't allow session specific environment variables from earlier sessions to
+-- 
+2.23.0
+
