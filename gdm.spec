@@ -10,7 +10,7 @@
 Name: gdm
 Epoch: 1
 Version: 3.33.90
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -18,10 +18,6 @@ URL: https://wiki.gnome.org/Projects/GDM
 Source0: http://download.gnome.org/sources/gdm/3.30/gdm-%{version}.tar.xz
 Source1: org.gnome.login-screen.gschema.override
 Patch0: 0001-Honor-initial-setup-being-disabled-by-distro-install.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1744059
-# This reverts https://gitlab.gnome.org/GNOME/gdm/commit/2802e92d27450d86d81b6356dd532ec80e797223
-# which triggered the bug
-Patch1: 0001-Revert-gdm-wayland-x-session-allow-users-to-overwrit.patch
 
 Patch10001: 0001-data-disable-wayland-if-modesetting-is-disabled.patch
 
@@ -315,6 +311,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Mon Aug 26 2019 Adam Williamson <awilliam@redhat.com> - 1:3.33.90-3
+- Drop patch from -2, better fix was applied to systemd
+
 * Thu Aug 22 2019 Adam Williamson <awilliam@redhat.com> - 1:3.33.90-2
 - Revert upstream commit that gives sbin priority in non-root $PATH
 - Resolves: #1744059
