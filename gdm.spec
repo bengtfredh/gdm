@@ -10,7 +10,7 @@
 Name: gdm
 Epoch: 1
 Version: 3.33.90
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -20,6 +20,7 @@ Source1: org.gnome.login-screen.gschema.override
 Patch0: 0001-Honor-initial-setup-being-disabled-by-distro-install.patch
 
 Patch10001: 0001-data-disable-wayland-if-modesetting-is-disabled.patch
+Patch10002: 0001-Revert-gdm-wayland-x-session-allow-users-to-overwrit.patch
 
 Patch99: system-dconf.patch
 
@@ -311,6 +312,11 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Wed Sep 04 2019 Benjamin Berg <bberg@redhat.com> - 1:3.33.90-4
+- Add patch to fix environment setup
+  https://gitlab.gnome.org/GNOME/gdm/merge_requests/82
+  See also #1746563
+
 * Mon Aug 26 2019 Adam Williamson <awilliam@redhat.com> - 1:3.33.90-3
 - Drop patch from -2, better fix was applied to systemd
 
