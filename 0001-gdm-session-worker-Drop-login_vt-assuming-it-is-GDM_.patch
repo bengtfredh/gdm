@@ -1,0 +1,141 @@
+From fd6736eb357100ce121762c386592e7703db71e0 Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Wed, 25 Sep 2019 14:51:40 +0200
+Subject: [PATCH] gdm-session-worker: Drop login_vt assuming it is
+ GDM_INITIAL_VT
+
+When a session ends, its "session worker" is closed. Since
+3e8220921bb608afd06ed677104fd2244b901a28 (3.33.4), we uninitialise PAM
+when this happens. As part of this procedure, we jump back to the login
+screen, if the screen being killed is not itself the login screen.
+
+This has broken fast user switching. It goes like this - this
+explanation is a bit complicated, bear with us:
+
+We want to jump back to the login screen when a normal user session
+ends, so that people can log in again. We do not want to do this when a
+login screen itself ends. When session workers start up, they query for
+the *currently active VT* and save this in `login_vt`. Then later on, we
+check if our session ID is the same as `login_vt`, and jump to
+`login_vt` if they are different - this means that it was a user session
+not a login session. Querying the currently active VT is fine for the
+first greeter, but when initiating a user switch it's wrong as this
+gives the user VT.
+
+GDM greeters are killed once they have spawned a session. They are
+associated with a logind session, and therefore a PAM session. There are
+some actions performed when unregistering PAM sessions, including the
+previously mentioned VT jump. Before
+3e8220921bb608afd06ed677104fd2244b901a28 we only uninitialised PAM when
+the session itself exited so the bug was masked, but now (since this
+commit), if the login screen's *worker* exits first - as happens in the
+normal case when GDM kills it - we also do this uninitialisation. Since
+we falsely recorded the login screen as the first user's VT, this means
+that checking `login_vt != session_vt` returns `TRUE` and we jump back
+to the previous user's session immediately after logging into the new
+session: fast user switching is broken.
+
+Since the work on shutting down the GDM session has been finished, we
+can assume that the login_vt is always on GDM_INITIAL_VT (see
+example c71bc5d6c3bc2ec448b5c72ce9a811d9c0c7905e
+"local-display-factory: Remove initial VT is in use check" and
+39fb4ff64e6a0653e70a3bfab31da47b49227d59 "manager: don't run autologin
+display on tty1"). So simply replace all usages of login_vt with
+GDM_INITIAL_VT to solve the above problem.
+
+Note that in the case where ENABLE_USER_DISPLAY_SERVER is not enabled,
+the login_vt is always the same as the session_vt. We can simply remove
+the VT switching magic there and everything should be working as
+expected.
+
+This is a simpler version of the patch by Iain Lane <iainl@gnome.org>,
+taking into account that we can make the assumption about the login_vt.
+
+Closes #515
+---
+ daemon/gdm-session-worker.c | 43 +++++++------------------------------
+ 1 file changed, 8 insertions(+), 35 deletions(-)
+
+diff --git a/daemon/gdm-session-worker.c b/daemon/gdm-session-worker.c
+index 0e854158..4f9083c3 100644
+--- a/daemon/gdm-session-worker.c
++++ b/daemon/gdm-session-worker.c
+@@ -146,7 +146,6 @@ struct GdmSessionWorkerPrivate
+         char            **extensions;
+ 
+         int               cred_flags;
+-        int               login_vt;
+         int               session_vt;
+         int               session_tty_fd;
+ 
+@@ -1052,13 +1051,15 @@ gdm_session_worker_uninitialize_pam (GdmSessionWorker *worker,
+ 
+         gdm_session_worker_stop_auditor (worker);
+ 
++#ifdef ENABLE_USER_DISPLAY_SERVER
+         if (g_strcmp0 (worker->priv->display_seat_id, "seat0") == 0) {
+-                if (worker->priv->login_vt != worker->priv->session_vt) {
+-                        jump_to_vt (worker, worker->priv->login_vt);
++                /* Switch to the login VT if we are not the login screen. */
++                if (worker->priv->session_vt != GDM_INITIAL_VT) {
++                        jump_to_vt (worker, GDM_INITIAL_VT);
+                 }
+         }
++#endif
+ 
+-        worker->priv->login_vt = 0;
+         worker->priv->session_vt = 0;
+ 
+         g_debug ("GdmSessionWorker: state NONE");
+@@ -1107,32 +1108,6 @@ _get_xauth_for_pam (const char *x11_authority_file)
+ }
+ #endif
+ 
+-static gboolean
+-ensure_login_vt (GdmSessionWorker *worker)
+-{
+-        int fd;
+-        struct vt_stat vt_state = { 0 };
+-        gboolean got_login_vt = FALSE;
+-
+-        fd = open ("/dev/tty0", O_RDWR | O_NOCTTY);
+-
+-        if (fd < 0) {
+-                g_debug ("GdmSessionWorker: couldn't open VT master: %m");
+-                return FALSE;
+-        }
+-
+-        if (ioctl (fd, VT_GETSTATE, &vt_state) < 0) {
+-                g_debug ("GdmSessionWorker: couldn't get current VT: %m");
+-                goto out;
+-        }
+-
+-        worker->priv->login_vt = vt_state.v_active;
+-        got_login_vt = TRUE;
+-out:
+-        close (fd);
+-        return got_login_vt;
+-}
+-
+ static gboolean
+ gdm_session_worker_initialize_pam (GdmSessionWorker   *worker,
+                                    const char         *service,
+@@ -1227,12 +1202,10 @@ gdm_session_worker_initialize_pam (GdmSessionWorker   *worker,
+         g_debug ("GdmSessionWorker: state SETUP_COMPLETE");
+         gdm_session_worker_set_state (worker, GDM_SESSION_WORKER_STATE_SETUP_COMPLETE);
+ 
+-        /* Temporarily set PAM_TTY with the currently active VT (login screen) 
++        /* Temporarily set PAM_TTY with the login VT,
+            PAM_TTY will be reset with the users VT right before the user session is opened */
+-        if (ensure_login_vt (worker)) {
+-                g_snprintf (tty_string, 256, "/dev/tty%d", worker->priv->login_vt);
+-                pam_set_item (worker->priv->pam_handle, PAM_TTY, tty_string);
+-        }
++        g_snprintf (tty_string, 256, "/dev/tty%d", GDM_INITIAL_VT);
++        pam_set_item (worker->priv->pam_handle, PAM_TTY, tty_string);
+         if (!display_is_local)
+                 worker->priv->password_is_required = TRUE;
+ 
+-- 
+2.21.0
+
