@@ -1,0 +1,173 @@
+From 25abc02995b91351fc48bd41c1824944d9225fe6 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Tue, 7 Apr 2020 14:37:41 -0400
+Subject: [PATCH] session-worker: ensure initial vt is never picked for
+ !is_initial displays
+
+Normally, a !is_initial display would never "get" tty1, since the system
+boots to tty1.  But if, for some reason, the user booted to runlevel 3,
+then switched to runlevel 5, the login screen could get started when
+tty1 is free.
+
+That means, e.g., an autologin user can end up getting allocated tty1,
+which is bad, since we assume tty1 is used for the login screen.
+
+This commit opens up /dev/tty1 when querying for available VTs, so that
+it never gets returned by the kernel as available.
+---
+ daemon/gdm-session-worker.c                  | 39 ++++++++++++++------
+ data/applications/mime-dummy-handler.desktop |  7 +---
+ 2 files changed, 28 insertions(+), 18 deletions(-)
+
+diff --git a/daemon/gdm-session-worker.c b/daemon/gdm-session-worker.c
+index 5acf55868..cb983302e 100644
+--- a/daemon/gdm-session-worker.c
++++ b/daemon/gdm-session-worker.c
+@@ -2163,105 +2163,120 @@ gdm_session_worker_start_session (GdmSessionWorker  *worker,
+ 
+         /* If we end up execing again, make sure we don't use the executable context set up
+          * by pam_selinux durin pam_open_session
+          */
+ #ifdef HAVE_SELINUX
+         setexeccon (NULL);
+ #endif
+ 
+         worker->priv->child_pid = session_pid;
+ 
+         g_debug ("GdmSessionWorker: session opened creating reply...");
+         g_assert (sizeof (GPid) <= sizeof (int));
+ 
+         g_debug ("GdmSessionWorker: state SESSION_STARTED");
+         gdm_session_worker_set_state (worker, GDM_SESSION_WORKER_STATE_SESSION_STARTED);
+ 
+         gdm_session_worker_watch_child (worker);
+ 
+  out:
+         if (error_code != PAM_SUCCESS) {
+                 gdm_session_worker_uninitialize_pam (worker, error_code);
+                 return FALSE;
+         }
+ 
+         return TRUE;
+ }
+ 
+ static gboolean
+ set_up_for_new_vt (GdmSessionWorker *worker)
+ {
+-        int fd;
++        int initial_vt_fd;
+         char vt_string[256], tty_string[256];
+         int session_vt = 0;
+ 
+-        fd = open ("/dev/tty0", O_RDWR | O_NOCTTY);
+-
+-        if (fd < 0) {
+-                g_debug ("GdmSessionWorker: couldn't open VT master: %m");
++        /* open the initial vt.  We need it for two scenarios:
++         *
++         * 1) display_is_initial is TRUE.  We need it directly.
++         * 2) display_is_initial is FALSE. We need it to mark
++         * the initial VT as "in use" so it doesn't get returned
++         * by VT_OPENQRY
++         * */
++        g_snprintf (tty_string, sizeof (tty_string), "/dev/tty%d", GDM_INITIAL_VT);
++        initial_vt_fd = open (tty_string, O_RDWR | O_NOCTTY);
++
++        if (initial_vt_fd < 0) {
++                g_debug ("GdmSessionWorker: couldn't open console of initial fd: %m");
+                 return FALSE;
+         }
+ 
+         if (worker->priv->display_is_initial) {
+                 session_vt = GDM_INITIAL_VT;
+         } else {
+-                if (ioctl(fd, VT_OPENQRY, &session_vt) < 0) {
++
++                /* Typically VT_OPENQRY is called on /dev/tty0, but we already
++                 * have /dev/tty1 open above, so might as well use it.
++                 */
++                if (ioctl (initial_vt_fd, VT_OPENQRY, &session_vt) < 0) {
+                         g_debug ("GdmSessionWorker: couldn't open new VT: %m");
+                         goto fail;
+                 }
+         }
+ 
+         worker->priv->session_vt = session_vt;
+ 
+-        close (fd);
+-        fd = -1;
+-
+         g_assert (session_vt > 0);
+ 
+         g_snprintf (vt_string, sizeof (vt_string), "%d", session_vt);
+ 
+         /* Set the VTNR. This is used by logind to configure a session in
+          * the logind-managed case, but it doesn't hurt to set it always.
+          * When logind gains support for XDG_VTNR=auto, we can make the
+          * OPENQRY and this whole path only used by the new VT code. */
+         gdm_session_worker_set_environment_variable (worker,
+                                                      "XDG_VTNR",
+                                                      vt_string);
+ 
+-        g_snprintf (tty_string, 256, "/dev/tty%d", session_vt);
+-        worker->priv->session_tty_fd = open (tty_string, O_RDWR | O_NOCTTY);
++        if (worker->priv->display_is_initial) {
++             worker->priv->session_tty_fd = initial_vt_fd;
++        } else {
++             g_snprintf (tty_string, sizeof (tty_string), "/dev/tty%d", session_vt);
++             worker->priv->session_tty_fd = open (tty_string, O_RDWR | O_NOCTTY);
++             close (initial_vt_fd);
++        }
++
+         pam_set_item (worker->priv->pam_handle, PAM_TTY, tty_string);
+ 
+         return TRUE;
+ 
+ fail:
+-        close (fd);
++        close (initial_vt_fd);
+         return FALSE;
+ }
+ 
+ static gboolean
+ set_xdg_vtnr_to_current_vt (GdmSessionWorker *worker)
+ {
+         int fd;
+         char vt_string[256];
+         struct vt_stat vt_state = { 0 };
+ 
+         fd = open ("/dev/tty0", O_RDWR | O_NOCTTY);
+ 
+         if (fd < 0) {
+                 g_debug ("GdmSessionWorker: couldn't open VT master: %m");
+                 return FALSE;
+         }
+ 
+         if (ioctl (fd, VT_GETSTATE, &vt_state) < 0) {
+                 g_debug ("GdmSessionWorker: couldn't get current VT: %m");
+                 goto fail;
+         }
+ 
+         close (fd);
+         fd = -1;
+ 
+         g_snprintf (vt_string, sizeof (vt_string), "%d", vt_state.v_active);
+ 
+         gdm_session_worker_set_environment_variable (worker,
+                                                      "XDG_VTNR",
+                                                      vt_string);
+diff --git a/data/applications/mime-dummy-handler.desktop b/data/applications/mime-dummy-handler.desktop
+index 8f6623ebc..ca405e5c1 100644
+--- a/data/applications/mime-dummy-handler.desktop
++++ b/data/applications/mime-dummy-handler.desktop
+@@ -1,6 +1 @@
+-[Desktop Entry]
+-Type=Application
+-Name=Dummy URI Handler
+-Exec=true %U
+-Terminal=false
+-StartupNotify=false
++[Default Applications]
+-- 
+2.21.1
+

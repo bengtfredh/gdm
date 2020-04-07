@@ -10,7 +10,7 @@
 Name: gdm
 Epoch: 1
 Version: 3.34.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -20,6 +20,9 @@ Source1: org.gnome.login-screen.gschema.override
 Patch0: 0001-Honor-initial-setup-being-disabled-by-distro-install.patch
 
 Patch10001: 0001-data-disable-wayland-if-modesetting-is-disabled.patch
+
+# fix autologin when gdm is started from vt other than vt1
+Patch20001: 0001-session-worker-ensure-initial-vt-is-never-picked-for.patch
 
 Patch99: system-dconf.patch
 
@@ -311,6 +314,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Tue Apr 07 2020 Ray Strode <rstrode@redhat.com> - 3.34.1-3
+- Fix autologin when gdm is started from VT other than VT 1
+
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.34.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
