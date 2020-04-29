@@ -9,8 +9,8 @@
 
 Name: gdm
 Epoch: 1
-Version: 3.34.1
-Release: 3%{?dist}
+Version: 3.35.1
+Release: 1%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -19,10 +19,7 @@ Source0: http://download.gnome.org/sources/gdm/3.34/gdm-%{version}.tar.xz
 Source1: org.gnome.login-screen.gschema.override
 Patch0: 0001-Honor-initial-setup-being-disabled-by-distro-install.patch
 
-Patch10001: 0001-data-disable-wayland-if-modesetting-is-disabled.patch
-
-# fix autologin when gdm is started from vt other than vt1
-Patch20001: 0001-session-worker-ensure-initial-vt-is-never-picked-for.patch
+#Patch10001: 0001-data-disable-wayland-if-modesetting-is-disabled.patch
 
 Patch99: system-dconf.patch
 
@@ -128,24 +125,15 @@ GDM specific authentication features.
 %prep
 %autosetup -S git
 
-autoreconf -i -f
-
 %build
-
-%configure --with-pam-prefix=%{_sysconfdir} \
-           --with-run-dir=/run/gdm \
-           --with-default-path=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin \
-           --enable-split-authentication \
-           --enable-profiling      \
-           --enable-console-helper \
-           --with-plymouth \
-           --with-selinux
-
-# drop unneeded direct library deps with --as-needed
-# libtool doesn't make this easy, so we do it the hard way
-sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0 /g' -e 's/    if test "$export_dynamic" = yes && test -n "$export_dynamic_flag_spec"; then/      func_append compile_command " -Wl,-O1,--as-needed"\n      func_append finalize_command " -Wl,-O1,--as-needed"\n\0/' libtool
-
-%make_build
+%meson -Dpam-prefix=%{_sysconfdir} \
+       -Drun-dir=/run/gdm \
+       -Dudev-dir=%{_udevrulesdir} \
+       -Ddefault-path=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin \
+       -Dprofiling=true \
+       -Dplymouth=enabled \
+       -Dselinux=enabled
+%meson_build
 
 
 %install
@@ -153,7 +141,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/gdm/Init
 mkdir -p %{buildroot}%{_sysconfdir}/gdm/PreSession
 mkdir -p %{buildroot}%{_sysconfdir}/gdm/PostSession
 
-%make_install
+%meson_install
 
 install -p -m644 -D %{SOURCE5} %{buildroot}%{_localstatedir}/lib/gdm/.config/pulse/default.pa
 
@@ -173,9 +161,6 @@ mkdir -p %{buildroot}/var/log/gdm
 mkdir -p %{buildroot}%{_datadir}/gdm/autostart/LoginWindow
 
 mkdir -p %{buildroot}/run/gdm
-
-find %{buildroot} -name '*.a' -delete
-find %{buildroot} -name '*.la' -delete
 
 %find_lang gdm --with-gnome
 
@@ -293,7 +278,6 @@ fi
 %attr(0700, gdm, gdm) %dir %{_localstatedir}/lib/gdm/.config/pulse
 %attr(0600, gdm, gdm) %{_localstatedir}/lib/gdm/.config/pulse/default.pa
 %attr(0711, root, gdm) %dir /run/gdm
-%attr(1755, root, gdm) %dir %{_localstatedir}/cache/gdm
 %config %{_sysconfdir}/pam.d/gdm-pin
 %config %{_sysconfdir}/pam.d/gdm-smartcard
 %config %{_sysconfdir}/pam.d/gdm-fingerprint
