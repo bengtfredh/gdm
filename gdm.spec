@@ -23,19 +23,19 @@ Patch10001: 0001-data-disable-wayland-if-modesetting-is-disabled.patch
 
 Patch99: system-dconf.patch
 
-BuildRequires: pam-devel >= 0:%{pam_version}
+BuildRequires: accountsservice-devel
+BuildRequires: audit-libs-devel >= %{libauditver}
+BuildRequires: dconf
 BuildRequires: desktop-file-utils >= %{desktop_file_utils_version}
-BuildRequires: libtool automake autoconf
-BuildRequires: libattr-devel
 BuildRequires: gettext-devel
 BuildRequires: git
+BuildRequires: keyutils-libs-devel
+BuildRequires: libXdmcp-devel
+BuildRequires: libattr-devel
 BuildRequires: libdmx-devel
-BuildRequires: audit-libs-devel >= %{libauditver}
-BuildRequires: autoconf automake libtool
-%ifnarch s390 s390x ppc ppc64
-BuildRequires: xorg-x11-server-Xorg
-%endif
+BuildRequires: meson
 BuildRequires: nss-devel >= %{nss_version}
+BuildRequires: pam-devel >= 0:%{pam_version}
 BuildRequires: pkgconfig(accountsservice) >= 0.6.3
 BuildRequires: pkgconfig(check)
 BuildRequires: pkgconfig(gobject-introspection-1.0)
@@ -49,10 +49,16 @@ BuildRequires: pkgconfig(systemd)
 BuildRequires: pkgconfig(x11)
 BuildRequires: pkgconfig(xau)
 BuildRequires: pkgconfig(xorg-server)
-BuildRequires: libXdmcp-devel
+BuildRequires: plymouth-devel
 BuildRequires: systemd
-BuildRequires: keyutils-libs-devel
-BuildRequires: dconf
+BuildRequires: systemd-devel
+BuildRequires: which
+%ifnarch s390 s390x ppc ppc64
+BuildRequires: xorg-x11-server-Xorg
+%endif
+BuildRequires: xorg-x11-server-devel
+BuildRequires: yelp-devel
+BuildRequires: yelp-tools
 
 Requires(pre):    /usr/sbin/useradd
 %{?systemd_requires}
