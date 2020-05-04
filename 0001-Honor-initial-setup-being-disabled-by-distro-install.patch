@@ -18,18 +18,6 @@ https://bugzilla.gnome.org/show_bug.cgi?id=777708
  daemon/gdm-display.c | 29 +++++++++++++++++++++++++++++
  2 files changed, 30 insertions(+)
 
-diff --git a/daemon/Makefile.am b/daemon/Makefile.am
-index 5e9eb5e..3b1b151 100644
---- a/daemon/Makefile.am
-+++ b/daemon/Makefile.am
-@@ -15,6 +15,7 @@ AM_CPPFLAGS = \
- 	-DLOCALSTATEDIR=\"$(localstatedir)\"		\
- 	-DLOGDIR=\"$(logdir)\"				\
- 	-DSBINDIR=\"$(sbindir)\"			\
-+	-DSYSCONFDIR=\"$(sysconfdir)\"			\
- 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\"	\
- 	-DGDM_RUN_DIR=\"$(GDM_RUN_DIR)\"		\
- 	-DGDM_XAUTH_DIR=\"$(GDM_XAUTH_DIR)\"		\
 diff --git a/daemon/gdm-display.c b/daemon/gdm-display.c
 index 5e193f2..878be88 100644
 --- a/daemon/gdm-display.c
