@@ -10,7 +10,7 @@
 Name: gdm
 Epoch: 1
 Version: 3.37.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -84,6 +84,10 @@ Requires: systemd >= 186
 Requires: system-logos
 Requires: xorg-x11-server-utils
 Requires: xorg-x11-xinit
+
+# Until the greeter gets dynamic user support, it can't
+# use a user bus
+Requires: /usr/bin/dbus-run-session
 
 Obsoletes: gdm-libs < 1:3.12.0-3
 Provides: gdm-libs%{?_isa} = %{epoch}:%{version}-%{release}
@@ -304,6 +308,10 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Tue May 05 2020 Ray Strode <rstrode@redhat.com> - 3.37.1-2
+- Make sure users have dbus-run-session installed since
+  the greeter depends on it.
+
 * Mon May 04 2020 Ray Strode <rstrode@redhat.com> - 3.37.1-1
 - Update to 3.37.1
 
