@@ -10,7 +10,7 @@
 Name: gdm
 Epoch: 1
 Version: 3.37.90
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -52,9 +52,7 @@ BuildRequires: plymouth-devel
 BuildRequires: systemd
 BuildRequires: systemd-devel
 BuildRequires: which
-%ifnarch s390 s390x ppc ppc64
 BuildRequires: xorg-x11-server-Xorg
-%endif
 BuildRequires: xorg-x11-server-devel
 BuildRequires: yelp-devel
 BuildRequires: yelp-tools
@@ -309,6 +307,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Tue Sep 08 2020 Dan Horák <dan[at]danny.cz> - 3.37.90-2
+- Remove stale and unnecessary architecture-specific exceptions
+
 * Mon Aug 17 2020 Kalev Lember <klember@redhat.com> - 1:3.37.90-1
 - Update to 3.37.90
 
