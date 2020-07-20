@@ -9,8 +9,8 @@
 
 Name: gdm
 Epoch: 1
-Version: 3.36.2
-Release: 2%{?dist}
+Version: 3.36.3
+Release: 1%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -315,6 +315,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Mon Jul 20 2020 Kalev Lember <klember@redhat.com> - 1:3.36.3-1
+- Update to 3.36.3
+
 * Tue May 05 2020 Ray Strode <rstrode@redhat.com> - 3.36.2-2
 - Make sure users have dbus-run-session installed since
   the greeter depends on it.
