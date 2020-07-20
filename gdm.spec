@@ -9,19 +9,18 @@
 
 Name: gdm
 Epoch: 1
-Version: 3.37.1
-Release: 2%{?dist}
+Version: 3.37.3
+Release: 1%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
 URL: https://wiki.gnome.org/Projects/GDM
 Source0: http://download.gnome.org/sources/gdm/3.34/gdm-%{version}.tar.xz
 Source1: org.gnome.login-screen.gschema.override
-Patch0: 0001-Honor-initial-setup-being-disabled-by-distro-install.patch
 
-Patch10001: 0001-data-disable-wayland-if-modesetting-is-disabled.patch
-
-Patch99: system-dconf.patch
+# Downstream patches
+Patch80001: 0001-Honor-initial-setup-being-disabled-by-distro-install.patch
+Patch90001: 0001-data-add-system-dconf-databases-to-gdm-profile.patch
 
 BuildRequires: accountsservice-devel
 BuildRequires: audit-libs-devel >= %{libauditver}
@@ -308,6 +307,12 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Mon Jul 20 2020 Ray Strode <rstrode@redhat.com> - 3.37.3-1
+- Update to 3.37.3
+- Kills login screen after login on Xorg systems
+- Fixes user switching bug
+  Resolves: #1829079
+
 * Tue May 05 2020 Ray Strode <rstrode@redhat.com> - 3.37.1-2
 - Make sure users have dbus-run-session installed since
   the greeter depends on it.
