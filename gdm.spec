@@ -10,7 +10,7 @@
 Name: gdm
 Epoch: 1
 Version: 3.37.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -307,6 +307,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.37.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Mon Jul 20 2020 Ray Strode <rstrode@redhat.com> - 3.37.3-1
 - Update to 3.37.3
 - Kills login screen after login on Xorg systems
