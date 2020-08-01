@@ -10,7 +10,7 @@
 Name: gdm
 Epoch: 1
 Version: 3.37.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -307,6 +307,10 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.37.3-4
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Tue Jul 28 2020 Adam Jackson <ajax@redhat.com> - 3.37.3-3
 - Requires xhost xmodmap xrdb, not xorg-x11-server-utils
 
