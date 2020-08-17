@@ -9,8 +9,8 @@
 
 Name: gdm
 Epoch: 1
-Version: 3.37.3
-Release: 4%{?dist}
+Version: 3.37.90
+Release: 1%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -293,6 +293,8 @@ fi
 %{_sysconfdir}/pam.d/gdm-launch-environment
 %{_udevrulesdir}/61-gdm.rules
 %{_unitdir}/gdm.service
+%dir %{_userunitdir}/gnome-session@gnome-login.target.d/
+%{_userunitdir}/gnome-session@gnome-login.target.d/session.conf
 
 %files devel
 %dir %{_includedir}/gdm
@@ -307,6 +309,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Mon Aug 17 2020 Kalev Lember <klember@redhat.com> - 1:3.37.90-1
+- Update to 3.37.90
+
 * Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.37.3-4
 - Second attempt - Rebuilt for
   https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
