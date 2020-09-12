@@ -9,7 +9,7 @@
 
 Name: gdm
 Epoch: 1
-Version: 3.37.90
+Version: 3.38.0
 Release: 1%{?dist}
 Summary: The GNOME Display Manager
 
@@ -309,6 +309,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Sat Sep 12 2020 Kalev Lember <klember@redhat.com> - 1:3.38.0-1
+- Update to 3.38.0
+
 * Mon Aug 17 2020 Kalev Lember <klember@redhat.com> - 1:3.37.90-1
 - Update to 3.37.90
 
