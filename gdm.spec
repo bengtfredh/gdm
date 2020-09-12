@@ -9,13 +9,13 @@
 
 Name: gdm
 Epoch: 1
-Version: 3.37.90
-Release: 2%{?dist}
+Version: 3.38.0
+Release: 1%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
 URL: https://wiki.gnome.org/Projects/GDM
-Source0: http://download.gnome.org/sources/gdm/3.37/gdm-%{version}.tar.xz
+Source0: http://download.gnome.org/sources/gdm/3.38/gdm-%{version}.tar.xz
 Source1: org.gnome.login-screen.gschema.override
 
 # Downstream patches
@@ -307,6 +307,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Sat Sep 12 2020 Kalev Lember <klember@redhat.com> - 1:3.38.0-1
+- Update to 3.38.0
+
 * Tue Sep 08 2020 Dan Horák <dan[at]danny.cz> - 3.37.90-2
 - Remove stale and unnecessary architecture-specific exceptions
 
