@@ -131,7 +131,7 @@ files that are helpful to PAM modules wishing to support
 GDM specific authentication features.
 
 %prep
-%autosetup
+%autosetup -S git
 
 autoreconf -i -f
 
@@ -319,7 +319,7 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
-* Sat Jan 9 2020 Bengt Fredh <bengt@fredhs.net> - 1:3.38.2.1-2
+* Sat Jan 9 2021 Bengt Fredh <bengt@fredhs.net> - 1:3.38.2.1-2
 - Revert meson build back to make build
 
 * Sat Dec 19 2020 Kalev Lember <klember@redhat.com> - 1:3.38.2.1-1
