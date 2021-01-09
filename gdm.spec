@@ -131,7 +131,7 @@ files that are helpful to PAM modules wishing to support
 GDM specific authentication features.
 
 %prep
-%autosetup -S git
+%autosetup
 
 autoreconf -i -f
 
