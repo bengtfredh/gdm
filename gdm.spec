@@ -14,7 +14,7 @@ Summary: The GNOME Display Manager
 
 License: GPLv2+
 URL: https://wiki.gnome.org/Projects/GDM
-Source0: http://download.gnome.org/sources/gdm/3.38/gdm-%{version}.tar.xz
+Source0: https://download.gnome.org/sources/gdm/3.38/gdm-%{version}.tar.xz
 Source1: org.gnome.login-screen.gschema.override
 
 # Downstream patches
