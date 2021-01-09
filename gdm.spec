@@ -10,7 +10,7 @@
 Name: gdm
 Epoch: 1
 Version: 3.38.2.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: The GNOME Display Manager
 
 License: GPLv2+
@@ -134,23 +134,31 @@ GDM specific authentication features.
 %prep
 %autosetup -S git
 
-%build
-%meson -Dpam-prefix=%{_sysconfdir} \
-       -Drun-dir=/run/gdm \
-       -Dudev-dir=%{_udevrulesdir} \
-       -Ddefault-path=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin \
-       -Dprofiling=true \
-       -Dplymouth=enabled \
-       -Dselinux=enabled
-%meson_build
+autoreconf -i -f
 
+%build
+
+%configure --with-pam-prefix=%{_sysconfdir} \
+           --with-run-dir=/run/gdm \
+           --with-default-path=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin \
+           --enable-split-authentication \
+           --enable-profiling      \
+           --enable-console-helper \
+           --with-plymouth \
+           --with-selinux
+
+# drop unneeded direct library deps with --as-needed
+# libtool doesn't make this easy, so we do it the hard way
+sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0 /g' -e 's/    if test "$export_dynamic" = yes && test -n "$export_dynamic_flag_spec"; then/      func_append compile_command " -Wl,-O1,--as-needed"\n      func_append finalize_command " -Wl,-O1,--as-needed"\n\0/' libtool
+
+%make_build
 
 %install
 mkdir -p %{buildroot}%{_sysconfdir}/gdm/Init
 mkdir -p %{buildroot}%{_sysconfdir}/gdm/PreSession
 mkdir -p %{buildroot}%{_sysconfdir}/gdm/PostSession
 
-%meson_install
+%make_install
 
 install -p -m644 -D %{SOURCE5} %{buildroot}%{_localstatedir}/lib/gdm/.config/pulse/default.pa
 
@@ -170,6 +178,9 @@ mkdir -p %{buildroot}/var/log/gdm
 mkdir -p %{buildroot}%{_datadir}/gdm/autostart/LoginWindow
 
 mkdir -p %{buildroot}/run/gdm
+
+find %{buildroot} -name '*.a' -delete
+find %{buildroot} -name '*.la' -delete
 
 %find_lang gdm --with-gnome
 
@@ -309,6 +320,9 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Sat Jan 9 2020 Bengt Fredh <bengt@fredhs.net> - 1:3.38.2.1-2
+- Revert meson build back to make build
+
 * Sat Dec 19 2020 Kalev Lember <klember@redhat.com> - 1:3.38.2.1-1
 - Update to 3.38.2.1
 
