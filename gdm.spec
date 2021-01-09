@@ -1,5 +1,4 @@
 %global _changelog_trimtime %(date +%s -d "1 year ago")
-%global _hardened_build 1
 
 %define libauditver 1.0.6
 %define gtk3_version 2.99.2
